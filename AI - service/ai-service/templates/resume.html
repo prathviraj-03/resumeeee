@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>{{ contact.name or "Resume" }}</title>
+
+<style>
+  body {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #222;
+    padding: 36pt 48pt;
+  }
+
+  h1 {
+    font-size: 20pt;
+    margin-bottom: 4pt;
+  }
+
+  .contact {
+    font-size: 9.5pt;
+    color: #444;
+    margin-bottom: 6pt;
+  }
+
+  .contact span + span::before {
+    content: " | ";
+    color: #999;
+  }
+
+  hr {
+    border: none;
+    border-top: 1.5pt solid #000;
+    margin: 8pt 0;
+  }
+
+  h2 {
+    font-size: 12pt;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ccc;
+    margin-top: 14pt;
+    margin-bottom: 6pt;
+  }
+
+  .entry {
+    margin-bottom: 10pt;
+  }
+
+  .title {
+    font-weight: bold;
+  }
+
+  .meta {
+    font-size: 9.5pt;
+    color: #666;
+  }
+
+  ul {
+    margin-left: 16pt;
+    margin-top: 3pt;
+  }
+
+  li {
+    font-size: 10pt;
+    margin-bottom: 2pt;
+  }
+
+  .skills span::after {
+    content: " • ";
+  }
+
+  .skills span:last-child::after {
+    content: "";
+  }
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+{% if contact.name %}
+<h1>{{ contact.name }}</h1>
+{% endif %}
+
+<div class="contact">
+  {% if contact.phone %}<span>{{ contact.phone }}</span>{% endif %}
+  {% if contact.email %}<span>{{ contact.email }}</span>{% endif %}
+  {% if contact.linkedin %}<span>{{ contact.linkedin }}</span>{% endif %}
+  {% if contact.location %}<span>{{ contact.location }}</span>{% endif %}
+</div>
+
+<hr>
+
+<!-- SUMMARY -->
+{% if summary %}
+<h2>Professional Summary</h2>
+<p>{{ summary }}</p>
+{% endif %}
+
+<!-- EXPERIENCE -->
+{% if experience %}
+<h2>Experience</h2>
+{% for job in experience %}
+<div class="entry">
+  <div class="title">{{ job.title }} — {{ job.company }}</div>
+  <div class="meta">
+    {% if job.duration %}{{ job.duration }}{% endif %}
+    {% if job.location %} | {{ job.location }}{% endif %}
+  </div>
+
+  {% if job.description %}
+  <ul>
+    {% for bullet in job.description %}
+    <li>{{ bullet }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- PROJECTS -->
+{% if projects %}
+<h2>Projects</h2>
+{% for project in projects %}
+<div class="entry">
+  <div class="title">{{ project.name }}</div>
+  <div class="meta">{{ project.duration }}</div>
+
+  <ul>
+    {% for bullet in project.description %}
+    <li>{{ bullet }}</li>
+    {% endfor %}
+  </ul>
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- EDUCATION -->
+{% if education %}
+<h2>Education</h2>
+{% for edu in education %}
+<div class="entry">
+  <div class="title">{{ edu.degree }}</div>
+  <div>{{ edu.institution }}</div>
+  <div class="meta">
+    {% if edu.year %}{{ edu.year }}{% endif %}
+    {% if edu.gpa %} | GPA: {{ edu.gpa }}{% endif %}
+  </div>
+
+  {% if edu.details %}
+  <ul>
+    {% for d in edu.details %}
+    <li>{{ d }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</div>
+{% endfor %}
+{% endif %}
+
+<!-- SKILLS -->
+{% if skills %}
+<h2>Skills</h2>
+<div class="skills">
+  {% for skill in skills %}
+  <span>{{ skill }}</span>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- CERTIFICATIONS -->
+{% if certifications %}
+<h2>Certifications</h2>
+<ul>
+  {% for cert in certifications %}
+  <li>{{ cert }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+<!-- SUGGESTIONS -->
+{% if suggestions %}
+<h2>Suggestions</h2>
+<ul>
+  {% for s in suggestions %}
+  <li>{{ s }}</li>
+  {% endfor %}
+</ul>
+{% endif %}
+
+</body>
+</html>

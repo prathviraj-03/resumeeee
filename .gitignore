@@ -1,0 +1,113 @@
+# ============================================================
+#  ResumeForge-X — Monorepo .gitignore
+#  Covers: Node.js, Python, Docker, IDEs, OS artefacts
+# ============================================================
+
+# ── Environment & Secrets ────────────────────────────────────
+.env
+.env.*
+!.env.example
+!.env.*.example
+
+# ── Node.js (API Gateway, auth-service, profile-service,
+#             interview-service, resumeforge frontend) ────────
+node_modules/
+dist/
+build/
+.next/
+out/
+*.tsbuildinfo
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+.npm/
+
+# ── Python (AI service, interview service) ───────────────────
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg
+*.egg-info/
+dist/
+.eggs/
+.venv/
+venv/
+env/
+ENV/
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+*.so
+
+# ── Celery ───────────────────────────────────────────────────
+celerybeat-schedule
+celerybeat.pid
+
+# ── Docker ───────────────────────────────────────────────────
+# Keep docker-compose.yml tracked; ignore local override files
+docker-compose.override.yml
+docker-compose.local.yml
+
+# ── Databases / Volumes ──────────────────────────────────────
+*.db
+*.sqlite3
+pgdata/
+
+# ── Uploads & Generated Files ────────────────────────────────
+uploads/
+tmp/
+temp/
+*.pdf
+*.docx
+# Do NOT ignore template .docx files checked into the repo
+!**/templates/**/*.docx
+
+# ── Prisma ───────────────────────────────────────────────────
+# Keep schema.prisma and migrations; ignore generated client
+profile-service/node_modules/.prisma/
+auth-service/node_modules/.prisma/
+
+# ── Logs ─────────────────────────────────────────────────────
+logs/
+*.log
+*.log.*
+
+# ── OS Artefacts ─────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ── IDE / Editor ─────────────────────────────────────────────
+.vscode/
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*.swo
+*~
+.project
+.classpath
+.settings/
+
+# ── Testing ──────────────────────────────────────────────────
+coverage/
+.nyc_output/
+
+# ── Misc ─────────────────────────────────────────────────────
+scratch/
+*.pem
+*.key
+*.cert

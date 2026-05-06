@@ -1,0 +1,70 @@
+You are building a production-grade Profile Service — a Node.js 20 + TypeScript + Express microservice responsible for user profile management, resume uploads to AWS S3, resume versioning, and storing AI-parsed resume data.
+
+TECH STACK:
+- Runtime: Node.js 20, TypeScript (strict mode)
+- Framework: Express.js
+- ORM: Prisma with PostgreSQL
+- File handling: Multer (memory storage, no disk writes)
+- AWS: AWS SDK v3 (@aws-sdk/client-s3, @aws-sdk/s3-request-presigner)
+- Auth: JWT validation middleware (no auth issuance — only validation)
+- Queue: Bull (Redis-backed) for publishing resume.uploaded events
+- Testing: Jest + Supertest
+
+DATABASE SCHEMA (PostgreSQL via Prisma):
+Tables: user_profiles, resumes, resume_structured_data
+- user_profiles: profile_id (UUID PK), user_id (UUID UNIQUE), full_name, phone_number, linkedin_url, portfolio_url
+- resumes: resume_id (UUID PK), user_id (UUID NOT NULL), version_number (INTEGER, auto-incremented per user), s3_storage_path (TEXT NOT NULL), original_filename (VARCHAR 255), created_at (TIMESTAMPTZ), is_deleted (BOOLEAN default false for soft-delete)
+- resume_structured_data: data_id (UUID PK), resume_id (UUID FK → resumes), parsed_content (JSONB), extracted_at (TIMESTAMPTZ)
+- Indexes: idx_resumes_user_id, idx_structured_data_resume_id
+
+API ENDPOINTS TO IMPLEMENT:
+- GET    /api/profile          → fetch authenticated user's profile
+- PUT    /api/profile          → update profile fields (partial update)
+- POST   /api/resume/upload    → multipart upload, validate MIME (PDF/DOCX only, max 10MB), stream to S3, store metadata, publish Bull event
+- GET    /api/resume           → list all resume versions for the user (exclude soft-deleted)
+- GET    /api/resume/:id       → get one resume's metadata
+- GET    /api/resume/:id/download → generate pre-signed S3 URL (15-minute TTL)
+- DELETE /api/resume/:id       → soft-delete (set is_deleted = true)
+All routes require JWT auth via authGuard middleware.
+
+CORE BUSINESS LOGIC:
+1. Upload Flow: Multer buffers file in RAM → file-validator checks MIME type (use file-type library, not just extension) and size → S3Service uploads to path `users/{userId}/resumes/{uuid}.{ext}` → ResumeService writes metadata to DB with auto-incremented version_number scoped per user → Bull queue publishes `resume.uploaded` event with { resumeId, userId, s3Key }
+2. Version numbering: Query MAX(version_number) WHERE user_id = ? then increment by 1. Use a DB transaction to prevent race conditions.
+3. Pre-signed URLs: Use @aws-sdk/s3-request-presigner with GetObjectCommand, 900 second expiry. Never return permanent S3 URLs.
+4. Soft delete: Set is_deleted = true. Do not physically delete S3 objects or DB rows.
+5. authGuard middleware: Validate Bearer JWT using jsonwebtoken, attach decoded userId to req.user. Return 401 on failure.
+
+FOLDER STRUCTURE TO CREATE:
+profile-service/
+  src/
+    controllers/    ProfileController.ts, ResumeController.ts
+    services/       ProfileService.ts, S3Service.ts, ResumeService.ts
+    routes/         profile.routes.ts, resume.routes.ts, index.ts
+    middleware/     authGuard.ts, upload.ts
+    utils/          s3.util.ts, file-validator.util.ts
+    config/         s3.config.ts, database.config.ts, queue.config.ts
+    types/          express.d.ts (extend Request with user field), dto types
+    app.ts          Express app setup (no listen)
+    server.ts       HTTP server entry point
+  prisma/
+    schema.prisma
+  tests/
+    unit/           services/
+    integration/    controllers/
+  Dockerfile
+  .env.example
+  tsconfig.json
+  package.json
+
+IMPLEMENTATION REQUIREMENTS:
+- Use Prisma Client for all DB operations, no raw SQL except for the version_number MAX query (use Prisma's aggregate instead)
+- All async handlers must use try/catch and a centralized error handler middleware
+- Multer must use memoryStorage() — never write to disk
+- S3Service must be a class with uploadFile(buffer, key, mimeType) and getPresignedUrl(key, ttlSeconds) methods
+- Create DTOs (plain interfaces) for UpdateProfileDto and ResumeUploadResponseDto
+- Add request validation using express-validator on PUT /api/profile (linkedin_url and portfolio_url must be valid URLs if provided)
+- Dockerfile: multi-stage build (builder stage compiles TS, production stage copies dist + node_modules, runs as non-root user)
+- Environment variables: DATABASE_URL, JWT_SECRET, AWS_REGION, AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, S3_BUCKET_NAME, REDIS_URL
+- Write at minimum: unit tests for S3Service.getPresignedUrl() and file-validator.util.ts, integration test for POST /api/resume/upload using mocked S3 and Prisma
+
+Generate all files with complete, production-ready implementations. Do not use placeholder comments like "// implement later". Every function must be fully implemented.

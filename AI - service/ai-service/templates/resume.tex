@@ -1,0 +1,114 @@
+\documentclass[11pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage[margin=0.75in]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\pagenumbering{gobble}
+
+\begin{document}
+
+% ---------- HEADER ----------
+\begin{center}
+{\LARGE \textbf{{ contact.name | latex_escape }}}\\[6pt]
+
+{% if contact.phone %}{{ contact.phone | latex_escape }}{% endif %}
+{% if contact.email %} \quad {{ contact.email | latex_escape }}{% endif %}
+
+{% if contact.location %}\\{{ contact.location | latex_escape }}{% endif %}
+{% if contact.linkedin %}\\{{ contact.linkedin | latex_escape }}{% endif %}
+{% if contact.github %}\\{{ contact.github | latex_escape }}{% endif %}
+\end{center}
+
+\vspace{10pt}
+
+% ---------- SUMMARY ----------
+{% if summary %}
+\section*{Professional Summary}
+{{ summary | latex_escape }}
+{% endif %}
+
+% ---------- EXPERIENCE ----------
+{% if experience %}
+\section*{Experience}
+{% for job in experience %}
+\textbf{{ job.title | latex_escape }}\\
+{{ job.company | latex_escape }}
+{% if job.duration %}\hfill {{ job.duration | latex_escape }}{% endif %}
+{% if job.location %}\\{{ job.location | latex_escape }}{% endif %}
+
+\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+{% for bullet in job.description %}
+\item {{ bullet | latex_escape }}
+{% endfor %}
+\end{itemize}
+\vspace{4pt}
+{% endfor %}
+{% endif %}
+
+% ---------- PROJECTS ----------
+{% if projects %}
+\section*{Projects}
+{% for project in projects %}
+\textbf{{ project.name | latex_escape }}\\
+{% if project.duration %}{{ project.duration | latex_escape }}{% endif %}
+
+\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+{% for bullet in project.description %}
+\item {{ bullet | latex_escape }}
+{% endfor %}
+\end{itemize}
+\vspace{4pt}
+{% endfor %}
+{% endif %}
+
+% ---------- SKILLS ----------
+{% if skills %}
+\section*{Skills}
+{{ skills | join(", ") | latex_escape }}
+{% endif %}
+
+% ---------- EDUCATION ----------
+{% if education %}
+\section*{Education}
+{% for edu in education %}
+\textbf{{ edu.degree | latex_escape }}\\
+{{ edu.institution | latex_escape }}
+{% if edu.year %}\hfill {{ edu.year | latex_escape }}{% endif %}
+
+{% if edu.gpa %}GPA: {{ edu.gpa | latex_escape }}\\{% endif %}
+
+{% if edu.details %}
+\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+{% for d in edu.details %}
+\item {{ d | latex_escape }}
+{% endfor %}
+\end{itemize}
+{% endif %}
+
+\vspace{4pt}
+{% endfor %}
+{% endif %}
+
+% ---------- CERTIFICATIONS ----------
+{% if certifications %}
+\section*{Certifications}
+\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+{% for cert in certifications %}
+\item {{ cert | latex_escape }}
+{% endfor %}
+\end{itemize}
+{% endif %}
+
+% ---------- SUGGESTIONS ----------
+{% if suggestions %}
+\section*{Suggestions}
+\begin{itemize}[leftmargin=*,noitemsep,topsep=0pt]
+{% for suggestion in suggestions %}
+\item {{ suggestion | latex_escape }}
+{% endfor %}
+\end{itemize}
+{% endif %}
+
+\end{document}

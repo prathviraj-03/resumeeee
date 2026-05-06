@@ -1,0 +1,434 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+@layer base {
+  :root {
+    /* Light mode (fallback) */
+    --background: 0 0% 100%;
+    --foreground: 240 10% 3.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 10% 3.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 10% 3.9%;
+    --primary: 239 84% 67%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 5.9% 90%;
+    --input: 240 5.9% 90%;
+    --ring: 239 84% 67%;
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* ResumeForge dark palette */
+    --background: 240 6% 7%;       /* #0F0F11 */
+    --foreground: 0 0% 98%;        /* #FAFAFA */
+    --card: 240 5% 11%;            /* #18181B */
+    --card-foreground: 0 0% 98%;
+    --popover: 240 5% 11%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 239 84% 67%;        /* #6366F1 */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4% 16%;       /* #27272A */
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 4% 16%;
+    --muted-foreground: 240 5% 65%; /* #A1A1AA */
+    --accent: 240 4% 16%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 84% 60%;      /* #EF4444 */
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 4% 16%;          /* #27272A */
+    --input: 240 4% 16%;
+    --ring: 239 84% 67%;
+    --radius: 0.75rem;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+    font-feature-settings: "cv11", "ss01";
+    font-variation-settings: "opsz" 32;
+  }
+
+  /* Scrollbar styling */
+  ::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    @apply bg-zinc-700 rounded-full;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-600;
+  }
+
+  /* Focus ring */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-primary-500 ring-offset-2 ring-offset-background;
+  }
+
+  /* Selection */
+  ::selection {
+    @apply bg-primary-500/20 text-primary-200;
+  }
+}
+
+@layer components {
+  /* ResumeForge Card */
+  .rf-card {
+    @apply bg-surface-card border border-surface-border rounded-xl shadow-card
+           transition-all duration-200;
+  }
+
+  .rf-card:hover {
+    @apply shadow-card-hover -translate-y-0.5;
+  }
+
+  /* Shimmer skeleton */
+  .skeleton {
+    @apply bg-zinc-800/60 rounded-lg overflow-hidden relative;
+  }
+
+  .skeleton::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      90deg,
+      transparent 0%,
+      rgba(255, 255, 255, 0.04) 50%,
+      transparent 100%
+    );
+    background-size: 200% 100%;
+    animation: shimmer 2s linear infinite;
+  }
+
+  /* Score gradient */
+  .score-bar-fill {
+    background: linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #22C55E 100%);
+    background-size: 200% 100%;
+    transition: background-position 0.6s ease;
+  }
+
+  /* Indigo glow button */
+  .btn-primary {
+    @apply bg-primary-500 hover:bg-primary-600 text-white font-medium
+           rounded-xl px-6 py-2.5 transition-all duration-200
+           hover:shadow-glow hover:-translate-y-0.5 active:translate-y-0;
+  }
+
+  .btn-ghost {
+    @apply border border-surface-border hover:border-primary-500/50
+           bg-transparent hover:bg-primary-500/5 text-zinc-400 hover:text-primary-400
+           font-medium rounded-xl px-6 py-2.5 transition-all duration-200;
+  }
+
+  /* Floating label input */
+  .input-dark {
+    @apply bg-surface-card border border-surface-border rounded-xl px-4 py-3
+           text-zinc-100 placeholder-zinc-600
+           focus:border-primary-500 focus:ring-1 focus:ring-primary-500/30
+           transition-all duration-200 w-full;
+  }
+
+  /* Status badges */
+  .badge {
+    @apply inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium;
+  }
+
+  .badge-success {
+    @apply bg-success/10 text-success border border-success/20;
+  }
+
+  .badge-warning {
+    @apply bg-warning/10 text-warning border border-warning/20;
+  }
+
+  .badge-danger {
+    @apply bg-danger/10 text-danger border border-danger/20;
+  }
+
+  .badge-primary {
+    @apply bg-primary-500/10 text-primary-400 border border-primary-500/20;
+  }
+
+  .badge-muted {
+    @apply bg-zinc-800 text-zinc-400 border border-zinc-700;
+  }
+
+  /* Nav item */
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-xl text-zinc-400
+           hover:text-zinc-100 hover:bg-zinc-800/60
+           transition-all duration-150 text-sm font-medium cursor-pointer;
+  }
+
+  .nav-item.active {
+    @apply text-primary-400 bg-primary-500/10;
+    box-shadow: inset 3px 0 0 #6366f1;
+  }
+
+  /* Drag drop zone */
+  .dropzone {
+    @apply border-2 border-dashed border-surface-border rounded-2xl
+           p-12 text-center transition-all duration-200 cursor-pointer;
+  }
+
+  .dropzone:hover,
+  .dropzone.dragover {
+    @apply border-primary-500/60 bg-primary-500/5;
+  }
+
+  /* Progress rings */
+  .progress-ring {
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+  }
+
+  /* Gradient text */
+  .gradient-text {
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary-400 to-primary-300;
+  }
+
+  /* Data table */
+  .data-table {
+    @apply w-full text-sm;
+  }
+
+  .data-table thead tr {
+    @apply border-b border-surface-border;
+  }
+
+  .data-table th {
+    @apply text-left text-zinc-500 font-medium py-3 px-4 text-xs uppercase tracking-wider;
+  }
+
+  .data-table td {
+    @apply py-4 px-4 text-zinc-300 border-b border-surface-border/50;
+  }
+
+  .data-table tbody tr:last-child td {
+    @apply border-b-0;
+  }
+
+  .data-table tbody tr {
+    @apply hover:bg-zinc-800/30 transition-colors duration-150;
+  }
+
+  /* Page header */
+  .page-header {
+    @apply mb-8;
+  }
+
+  .page-title {
+    @apply text-2xl font-bold text-zinc-50 mb-1;
+  }
+
+  .page-subtitle {
+    @apply text-sm text-zinc-500;
+  }
+
+  /* Section */
+  .section {
+    @apply mb-8;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-zinc-200 mb-4;
+  }
+
+  /* Keyword badge */
+  .keyword-badge {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-medium border;
+  }
+
+  .keyword-matched {
+    @apply bg-success/10 text-success border-success/30;
+  }
+
+  .keyword-missing {
+    @apply bg-danger/10 text-danger border-danger/30;
+  }
+
+  /* Diff highlight */
+  .diff-added {
+    @apply bg-success/10 text-success border-l-2 border-success pl-3;
+  }
+
+  .diff-original {
+    @apply bg-zinc-800/50 text-zinc-400 border-l-2 border-zinc-600 pl-3;
+  }
+
+  /* Topbar */
+  .topbar {
+    @apply h-16 border-b border-surface-border bg-surface/80
+           backdrop-blur-md flex items-center px-6 sticky top-0 z-40;
+  }
+
+  /* Sidebar */
+  .sidebar {
+    @apply w-64 bg-surface border-r border-surface-border
+           flex flex-col h-screen sticky top-0 overflow-y-auto;
+  }
+
+  /* Empty state */
+  .empty-state {
+    @apply flex flex-col items-center justify-center py-20 text-center;
+  }
+
+  /* Interview feedback card */
+  .feedback-card {
+    @apply rf-card p-5 border-l-4;
+  }
+
+  .feedback-card.strength {
+    @apply border-l-success;
+  }
+
+  .feedback-card.improvement {
+    @apply border-l-warning;
+  }
+
+  /* Roadmap card */
+  .roadmap-card {
+    @apply rf-card p-4 cursor-pointer;
+  }
+
+  /* Skill card */
+  .skill-card {
+    @apply rounded-xl p-3 text-center text-sm font-medium border transition-all duration-150;
+  }
+
+  .skill-present {
+    @apply bg-success/10 border-success/30 text-success;
+  }
+
+  .skill-missing {
+    @apply bg-danger/10 border-danger/30 text-danger;
+  }
+
+  .skill-partial {
+    @apply bg-warning/10 border-warning/30 text-warning;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .animation-delay-100 {
+    animation-delay: 100ms;
+  }
+  .animation-delay-200 {
+    animation-delay: 200ms;
+  }
+  .animation-delay-300 {
+    animation-delay: 300ms;
+  }
+  .animation-delay-400 {
+    animation-delay: 400ms;
+  }
+
+  .glass {
+    @apply bg-zinc-900/50 backdrop-blur-xl;
+  }
+
+  .border-gradient {
+    border-image: linear-gradient(135deg, #6366f1, #4338ca) 1;
+  }
+
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .hide-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+/* Framer Motion overrides */
+.motion-reduce * {
+  animation-duration: 0.01ms !important;
+  transition-duration: 0.01ms !important;
+}
+
+/* Sonner toast dark theme */
+[data-sonner-toaster] {
+  --normal-bg: #18181B !important;
+  --normal-border: #27272A !important;
+  --normal-text: #FAFAFA !important;
+  --success-bg: rgba(34, 197, 94, 0.1) !important;
+  --success-border: rgba(34, 197, 94, 0.3) !important;
+  --success-text: #22C55E !important;
+  --error-bg: rgba(239, 68, 68, 0.1) !important;
+  --error-border: rgba(239, 68, 68, 0.3) !important;
+  --error-text: #EF4444 !important;
+}
+
+/* Recharts dark theme */
+.recharts-text {
+  fill: #71717a !important;
+}
+
+.recharts-cartesian-grid-horizontal line,
+.recharts-cartesian-grid-vertical line {
+  stroke: #27272a !important;
+}
+
+.recharts-tooltip-wrapper .recharts-default-tooltip {
+  background: #18181b !important;
+  border: 1px solid #27272a !important;
+  border-radius: 0.75rem !important;
+}
+
+/* Loading dots animation */
+.loading-dots span {
+  display: inline-block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #6366f1;
+  animation: loading-dot 1.2s ease-in-out infinite;
+}
+
+.loading-dots span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes loading-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}

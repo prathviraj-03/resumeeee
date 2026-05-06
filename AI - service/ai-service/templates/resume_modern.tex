@@ -1,0 +1,92 @@
+\documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage[hidelinks]{hyperref}
+\usepackage[margin=0.5in]{geometry}
+\usepackage{enumitem}
+\usepackage{xcolor}
+\usepackage{titlesec}
+\pagenumbering{gobble}
+
+% Color definitions
+\definecolor{primary}{HTML}{2D3436}
+\definecolor{accent}{HTML}{0984E3}
+
+% Section formatting
+\titleformat{\section}{\large\bfseries\color{accent}}{}{0em}{}[\titlerule]
+\titlespacing*{\section}{0pt}{12pt}{8pt}
+
+\begin{document}
+
+% ---------- HEADER ----------
+\noindent
+\begin{minipage}[t]{0.7\textwidth}
+    {\Huge \textbf{\color{primary}{ contact.name | latex_escape }}}\\[4pt]
+    {\large Experienced Software Engineer} % Placeholder or can be dynamic
+\end{minipage}
+\begin{minipage}[t]{0.3\textwidth}
+    \raggedleft
+    \small
+    {% if contact.email %}\href{mailto:{{ contact.email }}}{ {{ contact.email | latex_escape }} }\\{% endif %}
+    {% if contact.phone %}{{ contact.phone | latex_escape }}\\{% endif %}
+    {% if contact.linkedin %}{{ contact.linkedin | latex_escape }}\\{% endif %}
+    {% if contact.github %}{{ contact.github | latex_escape }}{% endif %}
+\end{minipage}
+
+\vspace{10pt}
+
+% ---------- SUMMARY ----------
+{% if summary %}
+\section*{Summary}
+{{ summary | latex_escape }}
+{% endif %}
+
+% ---------- SKILLS ----------
+{% if skills %}
+\section*{Technical Skills}
+\textbf{Expertise:} {{ skills | join(", ") | latex_escape }}
+{% endif %}
+
+% ---------- EXPERIENCE ----------
+{% if experience %}
+\section*{Experience}
+{% for job in experience %}
+\noindent
+\textbf{\color{primary}{{ job.title | latex_escape }}} \hfill \small {{ job.duration | latex_escape }}\\
+\textit{{ job.company | latex_escape }} \hfill \small {{ job.location | latex_escape if job.location else "" }}\\
+\begin{itemize}[leftmargin=*,noitemsep,topsep=2pt]
+{% for bullet in job.description %}
+    \item {{ bullet | latex_escape }}
+{% endfor %}
+\end{itemize}
+\vspace{6pt}
+{% endfor %}
+{% endif %}
+
+% ---------- EDUCATION ----------
+{% if education %}
+\section*{Education}
+{% for edu in education %}
+\noindent
+\textbf{{ edu.degree | latex_escape }} \hfill \small {{ edu.year | latex_escape }}\\
+{{ edu.institution | latex_escape }} {% if edu.gpa %}(GPA: {{ edu.gpa | latex_escape }}){% endif %}
+\vspace{4pt}
+{% endfor %}
+{% endif %}
+
+% ---------- PROJECTS ----------
+{% if projects %}
+\section*{Selected Projects}
+{% for project in projects %}
+\noindent
+\textbf{{ project.name | latex_escape }}\\
+\begin{itemize}[leftmargin=*,noitemsep,topsep=2pt]
+{% for bullet in project.description %}
+    \item {{ bullet | latex_escape }}
+{% endfor %}
+\end{itemize}
+\vspace{4pt}
+{% endfor %}
+{% endif %}
+
+\end{document}

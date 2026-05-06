@@ -1,0 +1,92 @@
+# Auth Service API Endpoints (for Postman Testing)
+
+Base URL: http://localhost:3000
+
+---
+
+1. Health Check
+- Method: GET
+- URL: /health
+- Headers: None
+- Body: None
+
+---
+
+2. Register
+- Method: POST
+- URL: /api/auth/register
+- Headers: Content-Type: application/json
+- Body:
+  {
+    "email": "user@example.com",
+    "password": "P@ssw0rd1"
+  }
+
+---
+
+3. Login
+- Method: POST
+- URL: /api/auth/login
+- Headers: Content-Type: application/json
+- Body:
+  {
+    "email": "user@example.com",
+    "password": "P@ssw0rd1"
+  }
+
+---
+
+4. Get Current User (Protected)
+- Method: GET
+- URL: /api/auth/me
+- Headers: Authorization: Bearer <accessToken>
+- Body: None
+
+---
+
+5. Refresh Token
+- Method: POST
+- URL: /api/auth/refresh
+- Headers: Content-Type: application/json
+- Body:
+  {
+    "refreshToken": "<refreshToken>"
+  }
+
+---
+
+6. Logout (Protected)
+- Method: POST
+- URL: /api/auth/logout
+- Headers: Authorization: Bearer <accessToken>
+- Body: None
+
+---
+
+7. Forgot Password
+- Method: POST
+- URL: /api/auth/forgot-password
+- Headers: Content-Type: application/json
+- Body:
+  {
+    "email": "user@example.com"
+  }
+
+---
+
+8. Reset Password
+- Method: POST
+- URL: /api/auth/reset-password
+- Headers: Content-Type: application/json
+- Body:
+  {
+    "token": "<resetToken>",
+    "password": "NewP@ssw0rd1"
+  }
+
+---
+
+# Tips
+- Always use raw JSON for body in Postman.
+- For protected endpoints, set Authorization header with the latest accessToken.
+- Use environment variables in Postman for baseUrl, accessToken, refreshToken, and resetToken for easy chaining.

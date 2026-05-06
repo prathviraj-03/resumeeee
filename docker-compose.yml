@@ -1,0 +1,128 @@
+
+services:
+  # ── Infrastructure ─────────────────────────────────────────────────────────
+  postgres:
+    image: postgres:15-alpine
+    container_name: rf_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_DB: resumeforge
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: rf_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # ── Backend Microservices ──────────────────────────────────────────────────
+  api-gateway:
+    build:
+      context: "./API GATEWAY"
+    container_name: rf_api_gateway
+    ports:
+      - "8000:8000"
+    environment:
+      - PORT=8000
+      - REDIS_URL=redis://redis:6379
+      - JWT_SECRET=change-me-in-production
+      - AI_SERVICE_URL=http://ai-service:8001
+      - AUTH_SERVICE_URL=http://auth-service:8002
+      - PROFILE_SERVICE_URL=http://profile-service:8003
+      - INTERVIEW_SERVICE_URL=http://interview-service:8004
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  auth-service:
+    build:
+      context: ./auth-service
+    container_name: rf_auth_service
+    ports:
+      - "8002:8002"
+    environment:
+      - PORT=8002
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/resumeforge?schema=public
+      - JWT_SECRET=change-me-in-production
+      - JWT_REFRESH_SECRET=change-me-refresh-in-production
+      - JWT_EXPIRES_IN=1h
+      - JWT_REFRESH_EXPIRES_IN=7d
+      - REDIS_URL=redis://redis:6379
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  profile-service:
+    build:
+      context: ./profile-service
+    container_name: rf_profile_service
+    ports:
+      - "8003:8003"
+    environment:
+      - PORT=8003
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/resumeforge?schema=public
+      - JWT_SECRET=change-me-in-production
+    env_file:
+      - ./profile-service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  ai-service:
+    build:
+      context: "./AI - service/ai-service"
+    container_name: rf_ai_service
+    ports:
+      - "8001:8001"
+    environment:
+      - PORT=8001
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
+      - REDIS_URL=redis://redis:6379/0
+      - PROFILE_SERVICE_URL=http://profile-service:8003
+    env_file:
+      - "./AI - service/ai-service/.env"
+    volumes:
+      - "./AI - service/ai-service/app:/app/app"
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  interview-service:
+    build:
+      context: ./interview/interview-service
+    container_name: rf_interview_service
+    ports:
+      - "8004:8004"
+    environment:
+      - PORT=8004
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
+      - REDIS_URL=redis://redis:6379/0
+    env_file:
+      - ./interview/interview-service/.env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+volumes:
+  pgdata:

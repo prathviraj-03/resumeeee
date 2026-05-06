@@ -1,0 +1,102 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// Models...
+
+model user_profiles {
+  profile_id       String   @id @default(uuid())
+  user_id          String   @unique
+  
+  // Identity
+  full_name        String?
+  phone_number     String?
+  email            String?
+  location         String?
+  linkedin_url     String?
+  portfolio_url    String?
+  github_url       String?
+  avatar_url       String?
+  
+  // Career Intent
+  target_role      String?
+  target_industry  String?
+  years_experience Int?
+  
+  // Rich Professional Data
+  summary          String?  @db.Text
+  skills           String[] @default([])
+  certifications   String[] @default([])
+  languages        String[] @default([])
+  
+  // JSON blobs
+  experience       Json?
+  education        Json?
+  projects         Json?
+  awards           Json?
+  
+  // Profile completion tracking
+  completion_score Int      @default(0)
+  is_setup_done    Boolean  @default(false)
+  
+  // Timestamps
+  created_at       DateTime @default(now())
+  updated_at       DateTime @default(now()) @updatedAt
+  
+  resumes          resumes[] @relation("userResumes")
+}
+
+model resumes {
+  resume_id             String   @id @default(uuid())
+  user_id               String
+  version_number        Int
+  cloudinary_public_id  String
+  cloudinary_secure_url String
+  original_filename     String
+  created_at            DateTime @default(now())
+  is_deleted        Boolean  @default(false)
+
+  user              user_profiles @relation("userResumes", fields: [user_id], references: [user_id])
+  structured_data   resume_structured_data[] @relation("resumeStructuredData")
+
+  @@index([user_id], name: "idx_resumes_user_id")
+  @@unique([user_id, version_number])
+}
+
+model resume_structured_data {
+  data_id        String   @id @default(uuid())
+  resume_id      String
+  parsed_content Json
+  extracted_at   DateTime @default(now())
+
+  resume         resumes @relation("resumeStructuredData", fields: [resume_id], references: [resume_id])
+
+  @@index([resume_id], name: "idx_structured_data_resume_id")
+}
+
+model resume_templates {
+  template_id   String   @id @default(uuid())
+  user_id       String?  // Null means it's a System Template available to all
+
+  // Identity
+  name          String
+  description   String?
+
+  // The template file info (DOCX)
+  file_url      String
+  public_id     String
+  file_size     Int?
+
+  // One template can be marked as default for quick download
+  is_default    Boolean  @default(false)
+
+  // Timestamps
+  created_at    DateTime @default(now())
+  updated_at    DateTime @default(now()) @updatedAt
+
+  @@index([user_id], name: "idx_templates_user_id")
+}

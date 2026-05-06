@@ -1,0 +1,57 @@
+{
+  "name": "profile-service",
+  "version": "0.1.0",
+  "description": "Profile service for Resume Forge X",
+  "main": "dist/server.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/server.js",
+    "dev": "ts-node --transpile-only src/server.ts",
+    "lint": "eslint . --ext .ts",
+    "test": "jest",
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "prisma": {
+    "seed": "ts-node prisma/seed.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.5.0",
+    "@prisma/client": "^7.5.0",
+    "bull": "^4.16.5",
+    "cloudinary": "^2.0.0",
+    "docxtemplater": "^3.68.6",
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "express-validator": "^7.3.1",
+    "file-type": "^21.3.3",
+    "jsonwebtoken": "^9.0.3",
+    "libreoffice-convert": "^1.8.1",
+    "multer": "^2.1.1",
+    "pizzip": "^3.2.0",
+    "prisma": "^7.5.0",
+    "uuid": "^13.0.0"
+  },
+  "devDependencies": {
+    "@types/bull": "^3.15.9",
+    "@types/express": "^5.0.6",
+    "@types/express-validator": "^2.20.33",
+    "@types/jest": "^30.0.0",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.1.0",
+    "@types/node": "^25.5.0",
+    "@types/supertest": "^7.2.0",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.57.1",
+    "@typescript-eslint/parser": "^8.57.1",
+    "eslint": "^10.0.3",
+    "jest": "^30.3.0",
+    "supertest": "^7.2.2",
+    "ts-jest": "^29.4.6",
+    "ts-node": "^10.9.2",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.9.3"
+  }
+}
