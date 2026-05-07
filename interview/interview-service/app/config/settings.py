@@ -17,13 +17,18 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # LLM Configuration
-    LLM_PROVIDER: str = "google"  # google | openai | groq
+    LLM_PROVIDER: str = "ollama"  # ollama | google | openai
     OPENAI_API_KEY: str = "sk-placeholder"
     OPENAI_BASE_URL: str | None = None
     GOOGLE_API_KEY: str = ""
-    LLM_MODEL: str = "gemini-1.5-flash"
-    LLM_TIMEOUT: int = 30
+    LLM_MODEL: str = "llama3"
+    LLM_TIMEOUT: int = 120          # bumped for local model latency
     LLM_MAX_RETRIES: int = 2
+
+    # Ollama (local dev)
+    # Local:  http://localhost:11434
+    # Docker: http://host.docker.internal:11434
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
 
     # Cloudinary storage
     CLOUDINARY_CLOUD_NAME: str = ""

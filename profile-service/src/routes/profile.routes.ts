@@ -13,8 +13,9 @@ router.get("/", authGuard, (req, res, next) => profileController.getProfile(req,
 router.put(
   "/",
   authGuard,
-  body("linkedin_url").optional().isURL().withMessage("linkedin_url must be a valid URL"),
-  body("portfolio_url").optional().isURL().withMessage("portfolio_url must be a valid URL"),
+  body("linkedin_url").optional({ checkFalsy: true }).isURL().withMessage("linkedin_url must be a valid URL"),
+  body("github_url").optional({ checkFalsy: true }).isURL().withMessage("github_url must be a valid URL"),
+  body("portfolio_url").optional({ checkFalsy: true }).isURL().withMessage("portfolio_url must be a valid URL"),
   validateRequest,
   (req, res, next) => profileController.updateProfile(req, res, next)
 );

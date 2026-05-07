@@ -455,8 +455,20 @@ export interface UpdateTemplateRequest {
 }
 
 export interface SupportedToken {
-  token: string;        // e.g. "{{full_name}}"
-  description: string;  // e.g. "Your full name"
+  token: string;
+  description: string;
+}
+
+export interface SupportedLoop {
+  section: string;
+  syntax: string;
+  description: string;
+  inner_fields: string[];
+}
+
+export interface SupportedTokenResponse {
+  flat: SupportedToken[];
+  loops: SupportedLoop[];
 }
 
 // ─── PDF Generation (AI Service) ──────────────────────────────────────────

@@ -7,6 +7,7 @@ import type {
   CreateTemplateRequest,
   UpdateTemplateRequest,
   SupportedToken,
+  SupportedTokenResponse,
   GeneratePdfRequest,
   GeneratePdfResponse,
 } from "./types";
@@ -50,8 +51,8 @@ export async function deleteTemplate(id: string): Promise<void> {
 
 // ── Token support ──────────────────────────────────────────────────────────
 
-export async function getSupportedTokens(): Promise<SupportedToken[]> {
-  const res = await apiClient.get<SupportedToken[]>(API_ENDPOINTS.templates.tokens);
+export async function getSupportedTokens(): Promise<SupportedTokenResponse> {
+  const res = await apiClient.get<SupportedTokenResponse>(API_ENDPOINTS.templates.tokens);
   return res.data;
 }
 

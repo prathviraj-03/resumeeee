@@ -93,5 +93,6 @@ async def root():
             "download": "GET /api/v1/download/{job_id}",
             "job_history": "GET /api/v1/jobs",
             "delete_job": "DELETE /api/v1/jobs/{job_id}",
+            "ats_score": "POST /api/v1/ats/score",
         },
     }

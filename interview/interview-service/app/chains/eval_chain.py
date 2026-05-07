@@ -38,11 +38,11 @@ def _build_llm():
         )
     elif settings.LLM_PROVIDER == "ollama":
         from langchain_community.chat_models import ChatOllama
+        ollama_url = settings.OLLAMA_BASE_URL or "http://localhost:11434"
         return ChatOllama(
             model=settings.LLM_MODEL,
             temperature=0.3,
-            # For ollama, base_url is usually http://localhost:11434
-            base_url=settings.OPENAI_BASE_URL or "http://localhost:11434",
+            base_url=ollama_url,
         )
     
     # Default to OpenAI-compatible (works for Groq too)

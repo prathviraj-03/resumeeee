@@ -47,11 +47,10 @@ const setupProxy = (app) => {
         },
 
         // ── Skill Gap Service ─────────────────────────────────────────────────
-        // NOTE: Skill-gap analysis now lives in the Interview/Skills service.
-        // This route stays active to avoid breaking the frontend.
+        // Skill-gap analysis is handled by the AI Service.
         {
             prefix: '/api/skill-gap',
-            target: process.env.SKILL_GAP_SERVICE_URL || 'http://localhost:3003',
+            target: process.env.AI_SERVICE_URL || 'http://localhost:8001',
             auth: true,
         },
     ];

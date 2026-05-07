@@ -125,22 +125,86 @@ export class TemplateController {
   // GET /api/profile/templates/tokens
   async getSupportedTokens(_req: Request, res: Response, next: NextFunction) {
     try {
-      const tokens = [
-        { token: "{{full_name}}",      description: "Your full name" },
-        { token: "{{email}}",          description: "Email address" },
-        { token: "{{phone}}",          description: "Phone number" },
-        { token: "{{location}}",       description: "City / Country" },
-        { token: "{{linkedin_url}}",   description: "LinkedIn profile URL" },
-        { token: "{{github_url}}",     description: "GitHub profile URL" },
-        { token: "{{portfolio_url}}",  description: "Portfolio / website URL" },
-        { token: "{{target_role}}",    description: "Target job role" },
-        { token: "{{target_industry}}",description: "Target industry" },
-        { token: "{{summary}}",        description: "Professional summary" },
-        { token: "{{skills}}",         description: "Skills (comma-separated)" },
-        { token: "{{certifications}}", description: "Certifications (comma-separated)" },
-        { token: "{{languages}}",      description: "Languages (comma-separated)" },
-        { token: "{{years_experience}}",description: "Years of experience" },
-      ];
+      const tokens = {
+        flat: [
+          // Identity
+          { token: "{{full_name}}",        description: "Full name" },
+          { token: "{{email}}",            description: "Email address" },
+          { token: "{{phone}}",            description: "Phone number" },
+          { token: "{{location}}",         description: "City / Country" },
+          // Links
+          { token: "{{linkedin_url}}",     description: "LinkedIn URL" },
+          { token: "{{github_url}}",       description: "GitHub URL" },
+          { token: "{{portfolio_url}}",    description: "Portfolio / website URL" },
+          // Career
+          { token: "{{target_role}}",      description: "Target job role" },
+          { token: "{{target_industry}}", description: "Target industry" },
+          { token: "{{years_experience}}", description: "Years of experience" },
+          { token: "{{summary}}",          description: "Professional summary" },
+          // Flat comma-joined arrays
+          { token: "{{skills}}",           description: "Skills — comma-separated string" },
+          { token: "{{certifications}}",   description: "Certifications — comma-separated string" },
+          { token: "{{languages}}",        description: "Languages spoken — comma-separated" },
+          // Flat education shortcuts (from first education entry)
+          { token: "{{college_name}}",     description: "Institution / college name (first entry)" },
+          { token: "{{degree}}",           description: "Degree title (first entry)" },
+          { token: "{{cgpa}}",             description: "CGPA / Grade (first entry)" },
+          { token: "{{graduation_year}}",  description: "Graduation year (first entry)" },
+        ],
+        loops: [
+          {
+            section: "experience",
+            syntax: "{{#experience}} … {{/experience}}",
+            description: "Repeats for each work experience entry",
+            inner_fields: [
+              "{{title}}       — Job title",
+              "{{company}}     — Company name",
+              "{{duration}}    — Duration (e.g. Jan 2022 – Present)",
+              "{{description}} — Role description / achievements",
+            ],
+          },
+          {
+            section: "education",
+            syntax: "{{#education}} … {{/education}}",
+            description: "Repeats for each education entry",
+            inner_fields: [
+              "{{degree}}          — Degree name",
+              "{{institution}}     — University / college name",
+              "{{college_name}}    — Alias for institution",
+              "{{cgpa}}            — CGPA or grade",
+              "{{graduation_year}} — Year of graduation",
+            ],
+          },
+          {
+            section: "projects",
+            syntax: "{{#projects}} … {{/projects}}",
+            description: "Repeats for each project",
+            inner_fields: [
+              "{{name}}        — Project name",
+              "{{description}} — Project description",
+              "{{tech_stack}}  — Technologies used",
+              "{{url}}         — Project link / URL",
+            ],
+          },
+          {
+            section: "certifications_list",
+            syntax: "{{#certifications_list}} … {{/certifications_list}}",
+            description: "Repeats for each certification",
+            inner_fields: [
+              "{{name}} — Certification name",
+            ],
+          },
+          {
+            section: "awards",
+            syntax: "{{#awards}} … {{/awards}}",
+            description: "Repeats for each award",
+            inner_fields: [
+              "{{title}}       — Award title",
+              "{{description}} — Award description",
+            ],
+          },
+        ],
+      };
       return res.status(200).json(tokens);
     } catch (error) {
       return next(error);

@@ -46,6 +46,7 @@ export const API_ENDPOINTS = {
     // Job history
     listJobs:          "/api/ai/v1/jobs",
     deleteJob:         (jobId: string) => `/api/ai/v1/jobs/${jobId}`,
+    calculateATS:      "/api/ai/v1/ats/score",
   },
   templates: {
     list:    "/api/templates",

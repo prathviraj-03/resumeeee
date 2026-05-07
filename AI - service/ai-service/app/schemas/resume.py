@@ -34,6 +34,16 @@ class OptimizationRequest(BaseModel):
     template_id: str = Field(default="resume.html", description="HTML template name to use for PDF generation")
 
 
+class ATSScoreRequest(BaseModel):
+    jobDescription: str = Field(..., min_length=50, description="The job description to score against")
+
+
+class SkillGapRequest(BaseModel):
+    job_description: str = Field(..., min_length=50)
+    current_skills: Optional[list[str]] = None
+    profile_data: Optional[dict] = None
+
+
 class OptimizationResponse(BaseModel):
     job_id: str
     status: str                             # completed | failed

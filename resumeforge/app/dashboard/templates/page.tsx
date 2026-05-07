@@ -26,7 +26,7 @@ import {
   renderAndDownload,
   triggerDownload,
 } from "@/lib/api/templates";
-import type { ResumeTemplate, SupportedToken } from "@/lib/api/types";
+import type { ResumeTemplate, SupportedToken, SupportedTokenResponse } from "@/lib/api/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
@@ -34,22 +34,58 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
 // ─── Token Palette (Read Only) ────────────────────────────────────────────────
-function TokenPalette({ tokens }: { tokens: SupportedToken[] }) {
+function TokenPalette({ tokens }: { tokens: SupportedTokenResponse | null }) {
+  if (!tokens) return null;
+
   return (
-    <div className="flex flex-wrap gap-1.5">
-      {tokens.map((t) => (
-        <div
-          key={t.token}
-          title={t.description}
-          className="inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs font-mono
-                     bg-primary-500/10 border border-primary-500/20 text-primary-400"
-        >
-          {t.token}
+    <div className="space-y-6">
+      <div>
+        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Flat Fields</p>
+        <div className="flex flex-wrap gap-1.5">
+          {tokens.flat.map((t) => (
+            <div
+              key={t.token}
+              title={t.description}
+              className="group relative cursor-help"
+            >
+              <div className="px-2.5 py-1.5 rounded-lg text-[11px] font-mono
+                         bg-zinc-800 border border-zinc-700 text-zinc-300
+                         group-hover:border-primary-500/50 group-hover:bg-primary-500/5 
+                         group-hover:text-primary-400 transition-all">
+                {t.token}
+              </div>
+            </div>
+          ))}
         </div>
-      ))}
+      </div>
+
+      <div>
+        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Repeatable Sections (Loops)</p>
+        <div className="grid sm:grid-cols-2 gap-3">
+          {tokens.loops.map((l) => (
+            <div key={l.section} className="p-3 rounded-xl bg-zinc-900/50 border border-zinc-800 space-y-2">
+              <div className="flex items-center justify-between">
+                <code className="text-[11px] text-primary-400 font-bold">{l.syntax}</code>
+              </div>
+              <p className="text-[10px] text-zinc-500 leading-relaxed">{l.description}</p>
+              <div className="pt-2 border-t border-zinc-800/50">
+                <p className="text-[9px] font-bold text-zinc-600 uppercase mb-1.5">Inner Fields</p>
+                <div className="flex flex-wrap gap-1">
+                  {l.inner_fields.map((f, idx) => (
+                    <code key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">
+                      {f.split(' — ')[0]}
+                    </code>
+                  ))}
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
+
 
 // ─── Template Card ────────────────────────────────────────────────────────────
 function TemplateCard({
@@ -174,7 +210,7 @@ export default function TemplatesPage() {
     queryFn: listTemplates,
   });
 
-  const { data: tokens = [] } = useQuery<SupportedToken[]>({
+  const { data: tokens = null } = useQuery<SupportedTokenResponse>({
     queryKey: ["template-tokens"],
     queryFn: getSupportedTokens,
   });

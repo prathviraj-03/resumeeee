@@ -105,15 +105,85 @@ export class TemplateService {
     // 1. Fetch template data and profile
     const { template_url, profile_data, template_name } = await this.getTemplateData(userId, templateId);
     
-    // Merge overrides and clean nulls
-    const context: Record<string, any> = { ...profile_data, ...overrides };
-    for (const key in context) {
-      if (context[key] === null || context[key] === undefined) {
-        context[key] = "";
-      } else if (typeof context[key] === "object") {
-        context[key] = JSON.stringify(context[key]);
-      }
+    // ── Build template context ──────────────────────────────────────────────
+    const raw: Record<string, any> = { ...profile_data, ...overrides };
+
+    const context: Record<string, any> = {};
+
+    // ── Scalar / flat fields ────────────────────────────────────────────────
+    const scalarFields = [
+      "full_name", "email", "phone_number", "location",
+      "linkedin_url", "github_url", "portfolio_url",
+      "summary", "target_role", "target_industry", "years_experience",
+      "avatar_url",
+    ];
+    for (const key of scalarFields) {
+      context[key] = raw[key] ?? "";
     }
+
+    // Alias: {{phone}} → phone_number
+    context["phone"] = context["phone_number"];
+
+    // ── Comma-joined flat strings (for simple {{skills}} etc.) ──────────────
+    context["skills"]          = Array.isArray(raw.skills)         ? raw.skills.join(", ")         : "";
+    context["certifications"]  = Array.isArray(raw.certifications) ? raw.certifications.join(", ") : "";
+    context["languages"]       = Array.isArray(raw.languages)      ? raw.languages.join(", ")      : "";
+
+    // ── Loop arrays for {#tag}…{/tag} repeating sections ───────────────────
+    // experience: each item → { title, company, duration, description }
+    context["experience"] = Array.isArray(raw.experience)
+      ? raw.experience.map((e: any) => ({
+          title:       e.title       ?? e.job_title   ?? "",
+          company:     e.company     ?? "",
+          duration:    e.duration    ?? e.period       ?? "",
+          description: e.description ?? e.summary      ?? "",
+        }))
+      : [];
+
+    // education: each item → { degree, institution, college_name, cgpa, graduation_year }
+    context["education"] = Array.isArray(raw.education)
+      ? raw.education.map((e: any) => ({
+          degree:          e.degree          ?? "",
+          institution:     e.institution     ?? e.college_name ?? "",
+          college_name:    e.institution     ?? e.college_name ?? "",
+          cgpa:            e.cgpa            ?? e.grade         ?? "",
+          graduation_year: e.year            ?? e.graduation_year ?? "",
+        }))
+      : [];
+
+    // projects: each item → { name, description, tech_stack, url }
+    context["projects"] = Array.isArray(raw.projects)
+      ? raw.projects.map((p: any) => ({
+          name:        p.name        ?? p.title       ?? "",
+          description: p.description ?? p.summary     ?? "",
+          tech_stack:  p.tech_stack  ?? p.technologies ?? "",
+          url:         p.url         ?? p.link         ?? "",
+        }))
+      : [];
+
+    // certifications loop: each item → { name }
+    context["certifications_list"] = Array.isArray(raw.certifications)
+      ? raw.certifications.map((c: any) => ({
+          name: typeof c === "string" ? c : (c.name ?? String(c)),
+        }))
+      : [];
+
+    // awards loop: each item → { title, description }
+    context["awards"] = Array.isArray(raw.awards)
+      ? raw.awards.map((a: any) => ({
+          title:       a.title       ?? String(a),
+          description: a.description ?? "",
+        }))
+      : [];
+
+    // ── Flat aliases from first education entry ─────────────────────────────
+    const edu0: any = Array.isArray(raw.education) && raw.education.length > 0
+      ? raw.education[0]
+      : {};
+    context["college_name"]    = edu0.institution    ?? edu0.college_name    ?? "";
+    context["degree"]          = edu0.degree                                 ?? "";
+    context["cgpa"]            = edu0.cgpa           ?? edu0.grade           ?? "";
+    context["graduation_year"] = edu0.year           ?? edu0.graduation_year ?? "";
 
     // 2. Download the raw DOCX
     let response;
@@ -137,6 +207,8 @@ export class TemplateService {
         paragraphLoop: true,
         linebreaks: true,
         delimiters: { start: "{{", end: "}}" },
+        // Safety net: any tag not found in context → empty string (never "undefined")
+        nullGetter: () => "",
       });
       doc.render(context);
     } catch (error: any) {

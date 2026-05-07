@@ -18,36 +18,12 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
+import { calculateAtsScore } from "@/lib/api/ai";
 
 const schema = z.object({
   jobDescription: z.string().min(config.jdMinLength, `Paste the job description (min ${config.jdMinLength} chars)`),
 });
 type FormData = z.infer<typeof schema>;
-
-// Client-side keyword scoring (ATS service removed from AI microservice)
-function clientAtsScore(profile: any, jd: string): any {
-  const jdLower = jd.toLowerCase();
-  const profileText = JSON.stringify(profile ?? {}).toLowerCase();
-  const words = Array.from(new Set(jd.match(/\b[a-zA-Z]{4,}\b/g) ?? [])).map(w => w.toLowerCase());
-  const matched = words.filter(w => profileText.includes(w));
-  const missing = words.filter(w => !profileText.includes(w)).slice(0, 15);
-  const score = Math.min(95, Math.round((matched.length / Math.max(words.length, 1)) * 100));
-  return {
-    composite_score: score,
-    keyword_matches: matched.slice(0, 20),
-    keyword_gaps: missing,
-    resume_id: "client",
-    user_id: "client",
-    keyword_score: score,
-    semantic_score: Math.max(0, score - 8),
-    format_score: 85,
-    section_analysis: {},
-    suggestions: [
-      "Add missing keywords naturally into your experience bullets.",
-      "Tailor your summary to match the job's core requirements.",
-    ],
-  };
-}
 
 function normaliseATS(raw: any): any {
   const score = raw.composite_score ?? raw.overallScore ?? raw.overall_score ?? raw.score ?? 0;
@@ -57,9 +33,9 @@ function normaliseATS(raw: any): any {
   let pillars: ScorePillar[] = raw.pillars ?? raw.breakdown ?? [];
   if (pillars.length === 0) {
     pillars = [
-      { name: "Keyword Match",    score: Math.min(100, Math.round(score * 1.05)), weight: 60, description: "" },
-      { name: "Semantic Fit",     score: Math.min(100, Math.round(score * 0.95)), weight: 25, description: "" },
-      { name: "Format Quality",   score: Math.min(100, Math.round(score * 0.9)),  weight: 15, description: "" },
+      { name: "Keyword Match",    score: raw.keyword_score ?? Math.min(100, Math.round(score * 1.05)), weight: 60, description: "" },
+      { name: "Semantic Fit",     score: raw.semantic_score ?? Math.min(100, Math.round(score * 0.95)), weight: 25, description: "" },
+      { name: "Format Quality",   score: raw.format_score ?? Math.min(100, Math.round(score * 0.9)),  weight: 15, description: "" },
     ];
   }
   return { ...raw, overallScore: score, pillars, matchedKeywords: matched, missingKeywords: missing };
@@ -193,9 +169,7 @@ export default function ATSScorePage() {
   const jdValue = watch("jobDescription") || "";
 
   const scoreMutation = useMutation({
-    mutationFn: async (payload: { jobDescription: string }) => {
-      return clientAtsScore(profile, payload.jobDescription);
-    },
+    mutationFn: calculateAtsScore,
     onSuccess: (data) => { setResult(data); toast.success("ATS score calculated!"); },
     onError: (err) => toast.error(getErrorMessage(err)),
   });

@@ -17,9 +17,19 @@ class Settings(BaseSettings):
     DATABASE_POOL_SIZE: int = 5
     DATABASE_MAX_OVERFLOW: int = 10
 
-    # ── OpenAI ───────────────────────────────────────────────────
+    # ── LLM Provider Switch ──────────────────────────────────────
+    # Options: "openai" | "ollama"
+    LLM_PROVIDER: str = "ollama"
+
+    # ── OpenAI (kept for production / future use) ─────────────────
     OPENAI_API_KEY: str = ""
     OPENAI_MODEL: str = "gpt-4o-mini"
+
+    # ── Ollama (local dev) ────────────────────────────────────────
+    # Local:  http://localhost:11434
+    # Docker: http://host.docker.internal:11434
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3"
 
     # ── Profile Service ──────────────────────────────────────────
     PROFILE_SERVICE_URL: str = "http://localhost:3002"

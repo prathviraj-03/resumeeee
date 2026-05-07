@@ -95,6 +95,12 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
       - REDIS_URL=redis://redis:6379/0
       - PROFILE_SERVICE_URL=http://profile-service:8003
+      # ── Ollama (reaches host machine from inside Docker) ──
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - OLLAMA_MODEL=llama3
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - "./AI - service/ai-service/.env"
     volumes:
@@ -116,6 +122,13 @@ services:
       - PORT=8004
       - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
       - REDIS_URL=redis://redis:6379/0
+      # ── Ollama (reaches host machine from inside Docker) ──
+      - LLM_PROVIDER=ollama
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
+      - LLM_MODEL=llama3
+      - LLM_TIMEOUT=120
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     env_file:
       - ./interview/interview-service/.env
     depends_on:

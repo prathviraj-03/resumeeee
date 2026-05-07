@@ -64,3 +64,11 @@ export async function downloadOptimizedPdf(jobId: string, filename = "optimized_
     toast.error("Download failed: " + (error.message || "Try again"));
   }
 }
+
+// ── ATS Scorer ──────────────────────────────────────────────────────────────
+export async function calculateAtsScore(payload: { jobDescription: string }): Promise<any> {
+  const res = await apiClient.post(API_ENDPOINTS.ai.calculateATS, {
+    jobDescription: payload.jobDescription,
+  });
+  return res.data;
+}
