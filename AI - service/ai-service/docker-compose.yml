@@ -3,7 +3,7 @@ x-common-env: &common-env
   REDIS_URL: redis://redis:6379/0
   CELERY_BROKER_URL: redis://redis:6379/1
   CELERY_RESULT_BACKEND: redis://redis:6379/2
-  LLM_PROVIDER: ${LLM_PROVIDER:-ollama}
+  LLM_PROVIDER: ${LLM_PROVIDER:-openai}
   OLLAMA_BASE_URL: ${OLLAMA_BASE_URL:-http://host.docker.internal:11434}
   OLLAMA_MODEL: ${OLLAMA_MODEL:-llama3}
   HF_API_TOKEN: ${HF_API_TOKEN:-}

@@ -6,14 +6,19 @@ Output: OptimizedResumeData — structured JSON ready for PDF rendering
 """
 import json
 import re
-from openai import AsyncOpenAI
 from app.config import get_settings
 from app.schemas.resume import OptimizedResumeData, ContactInfo
 from app.utils.logger import logger
+from app.utils.llm_client import (
+    get_ai_client,
+    get_ai_model,
+    supports_json_mode,
+    build_system_prompt,
+)
 
 settings = get_settings()
 
-SYSTEM_PROMPT = """\
+_BASE_SYSTEM_PROMPT = """\
 You are an expert ATS resume optimization specialist with 10+ years experience helping
 candidates land interviews at top companies. Your task is to rewrite the candidate's
 resume to maximize its relevance and ATS score for the given job description.
@@ -64,15 +69,18 @@ Output JSON format:
 }
 """
 
+SYSTEM_PROMPT = build_system_prompt(_BASE_SYSTEM_PROMPT)
+
 
 def _clean_json(raw: str) -> str:
     """Strip markdown fences and extract the JSON object."""
+    # Strip markdown fences
     raw = re.sub(r"```(?:json)?\s*", "", raw)
     raw = re.sub(r"```\s*", "", raw)
-    start = raw.find("{")
-    end = raw.rfind("}")
-    if start != -1 and end != -1:
-        return raw[start:end + 1]
+    # Extract everything between the first { and the last }
+    match = re.search(r"(\{.*\})", raw, re.DOTALL)
+    if match:
+        return match.group(1)
     return raw.strip()
 
 
@@ -108,14 +116,11 @@ async def run_optimization_chain(
     job_description: str,
 ) -> OptimizedResumeData:
     """
-    Call OpenAI to generate an ATS-optimized resume from a master profile + JD.
+    Call the configured LLM (OpenAI or Ollama) to generate an ATS-optimized resume.
     Falls back to the raw profile if the API call fails.
     """
-    if not settings.OPENAI_API_KEY:
-        logger.warning("openai_key_missing_using_fallback")
-        return _build_fallback(profile)
-
-    client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
+    client = get_ai_client()
+    model = get_ai_model()
 
     # Compact JSON — saves tokens
     profile_json = json.dumps(profile, indent=None, separators=(",", ":"))
@@ -127,28 +132,40 @@ async def run_optimization_chain(
         f"JOB DESCRIPTION:\n{jd_snippet}"
     )
 
+    # Build call arguments
+    call_kwargs: dict = dict(
+        model=model,
+        messages=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_message},
+        ],
+        temperature=0.3,
+        max_tokens=2048,
+        timeout=120.0,
+    )
+
+    if supports_json_mode():
+        call_kwargs["response_format"] = {"type": "json_object"}
+
     try:
-        response = await client.chat.completions.create(
-            model=settings.OPENAI_MODEL,
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {"role": "user", "content": user_message},
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.3,
-            max_tokens=2048,
-        )
+        logger.info("optimization_request_start", provider=settings.LLM_PROVIDER, model=model)
+        response = await client.chat.completions.create(**call_kwargs)
 
         raw_output = response.choices[0].message.content or ""
         logger.info(
-            "openai_optimization_complete",
-            model=settings.OPENAI_MODEL,
+            "optimization_llm_complete",
+            provider=settings.LLM_PROVIDER,
+            model=model,
             tokens_used=response.usage.total_tokens if response.usage else 0,
         )
 
-        data = json.loads(_clean_json(raw_output))
+        cleaned_json = _clean_json(raw_output)
+        data = json.loads(cleaned_json)
 
-        contact_data = data.get("contact") or {}
+        contact_data = data.get("contact")
+        if not isinstance(contact_data, dict):
+            contact_data = {}
+            
         return OptimizedResumeData(
             contact=ContactInfo(**contact_data) if contact_data else None,
             summary=data.get("summary", ""),
@@ -160,10 +177,7 @@ async def run_optimization_chain(
             suggestions=data.get("suggestions", []),
         )
 
-    except json.JSONDecodeError as e:
-        logger.error("optimization_json_parse_error", error=str(e))
+    except (json.JSONDecodeError, Exception) as e:
+        logger.error("optimization_failed", provider=settings.LLM_PROVIDER, error=str(e))
         return _build_fallback(profile)
 
-    except Exception as e:
-        logger.error("optimization_openai_error", error=str(e))
-        return _build_fallback(profile)

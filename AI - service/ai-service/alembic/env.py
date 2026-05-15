@@ -6,7 +6,7 @@ from sqlalchemy.ext.asyncio import async_engine_from_config
 from alembic import context
 
 from app.models.base import Base
-from app.models.resume import Resume, ATSScore, OptimizationJob  # noqa: F401 — register models
+from app.models.resume import OptimizationJob  # noqa: F401 — register models
 from app.config import get_settings
 
 settings = get_settings()

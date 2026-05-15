@@ -58,6 +58,7 @@ services:
       - PORT=8002
       - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/resumeforge?schema=public
       - JWT_SECRET=change-me-in-production
+      - SECRET_KEY=change-me-in-production
       - JWT_REFRESH_SECRET=change-me-refresh-in-production
       - JWT_EXPIRES_IN=1h
       - JWT_REFRESH_EXPIRES_IN=7d
@@ -78,6 +79,7 @@ services:
       - PORT=8003
       - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/resumeforge?schema=public
       - JWT_SECRET=change-me-in-production
+      - SECRET_KEY=change-me-in-production
     env_file:
       - ./profile-service/.env
     depends_on:
@@ -95,10 +97,8 @@ services:
       - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
       - REDIS_URL=redis://redis:6379/0
       - PROFILE_SERVICE_URL=http://profile-service:8003
-      # ── Ollama (reaches host machine from inside Docker) ──
-      - LLM_PROVIDER=ollama
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - OLLAMA_MODEL=llama3
+      - JWT_SECRET=change-me-in-production
+      - SECRET_KEY=change-me-in-production
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
@@ -122,15 +122,15 @@ services:
       - PORT=8004
       - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
       - REDIS_URL=redis://redis:6379/0
-      # ── Ollama (reaches host machine from inside Docker) ──
-      - LLM_PROVIDER=ollama
-      - OLLAMA_BASE_URL=http://host.docker.internal:11434
-      - LLM_MODEL=llama3
-      - LLM_TIMEOUT=120
+      - JWT_SECRET=change-me-in-production
+      - SECRET_KEY=change-me-in-production
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
       - ./interview/interview-service/.env
+    volumes:
+      - ./interview/interview-service/app:/app/app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8004
     depends_on:
       postgres:
         condition: service_healthy

@@ -72,50 +72,55 @@ def get_llm():
 
 # ── Prompts ────────────────────────────────────────────────────────────────
 
-TECHNICAL_SYSTEM = """You are an expert technical interviewer evaluating a candidate's answer.
-Score the answer on three dimensions (0-10 each):
-1. relevance  — Does it directly address the question?
-2. depth      — Technical accuracy, detail, and completeness.
-3. clarity    — Clear, structured, easy to follow.
+TECHNICAL_SYSTEM = """You are an expert technical interviewer. Evaluate the candidate's answer based on technical accuracy, depth, and relevance.
+Scoring Rubric (0-10):
+- 0: Completely irrelevant or "I don't know".
+- 1-3: Major technical inaccuracies or very shallow.
+- 4-6: Correct but lacks depth or has minor inaccuracies.
+- 7-9: Strong, accurate, and detailed answer.
+- 10: Perfect, comprehensive, and insightful.
 
-Respond ONLY with valid JSON (no markdown, no prose) in this exact structure:
+Respond ONLY with valid JSON (no markdown):
 {{
-  "relevance": <int 0-10>,
-  "depth": <int 0-10>,
-  "clarity": <int 0-10>,
-  "overall_score": <int 0-10>,
+  "relevance": <float 0-10>,
+  "depth": <float 0-10>,
+  "clarity": <float 0-10>,
+  "overall_score": <float 0-10>,
   "feedback": "<2-4 sentences of specific, constructive feedback>"
 }}"""
 
-BEHAVIORAL_SYSTEM = """You are an expert behavioral interviewer evaluating a candidate's answer.
-Score on four dimensions (0-10 each):
-1. relevance   — Does it address the behavioral question?
-2. depth       — Richness of context, actions, and outcome.
-3. clarity     — Communication quality.
-4. star_format — Adherence to STAR (Situation, Task, Action, Result).
+BEHAVIORAL_SYSTEM = """You are an expert behavioral interviewer. Evaluate the answer using the STAR method (Situation, Task, Action, Result) as a guide.
+Scoring Rubric (0-10):
+- 0: Irrelevant.
+- 1-3: Poorly structured, missing Action or Result.
+- 4-6: Clear but missing specific details or impact.
+- 7-9: Strong STAR structure with clear actions and quantifiable results.
+- 10: Exceptional story-telling with high impact.
 
-Respond ONLY with valid JSON (no markdown, no prose):
+Respond ONLY with valid JSON:
 {{
-  "relevance": <int 0-10>,
-  "depth": <int 0-10>,
-  "clarity": <int 0-10>,
-  "star_format": <int 0-10>,
-  "overall_score": <int 0-10>,
+  "relevance": <float 0-10>,
+  "depth": <float 0-10>,
+  "clarity": <float 0-10>,
+  "star_format": <float 0-10>,
+  "overall_score": <float 0-10>,
   "feedback": "<2-4 sentences of specific, constructive feedback>"
 }}"""
 
-HR_SYSTEM = """You are a senior HR interviewer evaluating a candidate's answer.
-Score on three dimensions (0-10 each):
-1. relevance — Addresses the HR question directly.
-2. depth     — Self-awareness, cultural fit signals, professionalism.
-3. clarity   — Articulate, confident, concise.
+HR_SYSTEM = """You are a senior HR interviewer. Evaluate the candidate's professionalism, self-awareness, and cultural fit signals.
+Scoring Rubric (0-10):
+- 0: Unprofessional or irrelevant.
+- 1-3: Vague, lack of self-awareness.
+- 4-6: Standard answer, lacks personality or specific examples.
+- 7-9: Mature, articulate, and well-aligned with role values.
+- 10: Outstanding professionalism and alignment.
 
-Respond ONLY with valid JSON (no markdown, no prose):
+Respond ONLY with valid JSON:
 {{
-  "relevance": <int 0-10>,
-  "depth": <int 0-10>,
-  "clarity": <int 0-10>,
-  "overall_score": <int 0-10>,
+  "relevance": <float 0-10>,
+  "depth": <float 0-10>,
+  "clarity": <float 0-10>,
+  "overall_score": <float 0-10>,
   "feedback": "<2-4 sentences of specific, constructive feedback>"
 }}"""
 
@@ -202,13 +207,23 @@ async def evaluate_answer(
             }),
             timeout=settings.LLM_TIMEOUT,
         )
-        # Strip potential markdown fences from poorly-behaved models
-        raw = raw.strip().strip("```json").strip("```").strip()
+        # Robust JSON extraction
+        import re
+        match = re.search(r'(\{.*\})', raw, re.DOTALL)
+        if match:
+            raw = match.group(1)
+        else:
+            # Fallback to stripping
+            raw = raw.strip().strip("```json").strip("```").strip()
+            
         result = json.loads(raw)
-        # Clamp all int fields to 0-10
+        # Clamp all fields to 0-10 and handle potential floats
         for key in ("relevance", "depth", "clarity", "star_format", "overall_score"):
             if key in result:
-                result[key] = max(0, min(10, int(result[key])))
+                try:
+                    result[key] = max(0, min(10, round(float(result[key]))))
+                except (ValueError, TypeError):
+                    result[key] = 5
         return result
 
     except asyncio.TimeoutError:

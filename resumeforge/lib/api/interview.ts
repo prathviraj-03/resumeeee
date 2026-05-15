@@ -77,3 +77,7 @@ export async function endSession(sessionId: string): Promise<SessionEndResponse>
   );
   return res.data;
 }
+
+export async function deleteSession(sessionId: string): Promise<void> {
+  await apiClient.delete(API_ENDPOINTS.interview.session(sessionId));
+}

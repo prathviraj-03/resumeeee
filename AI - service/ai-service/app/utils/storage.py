@@ -95,12 +95,16 @@ class CloudinaryStorage:
         resource_type = "raw" if is_pdf else "image"
 
         try:
-            resource = await anyio.to_thread.run_sync(
-                partial(self.api.resource, public_id, resource_type=resource_type)
-            )
-            url = resource.get("secure_url") or resource.get("url")
-        except Exception:
-            # Fallback: build URL directly if API call fails
+            # Build URL directly for raw resources (PDFs) to avoid API call overhead and 401s
+            if resource_type == "raw":
+                url = self._build_raw_url(public_id)
+            else:
+                resource = await anyio.to_thread.run_sync(
+                    partial(self.api.resource, public_id, resource_type=resource_type)
+                )
+                url = resource.get("secure_url") or resource.get("url")
+        except Exception as e:
+            logger.warning("cloudinary_metadata_fetch_failed", public_id=public_id, error=str(e))
             url = self._build_raw_url(public_id)
 
         if not url:

@@ -188,24 +188,16 @@ function SessionSummary({ session }: { session: InterviewSession }) {
             <h4 className="text-sm font-semibold text-zinc-300">Per-Question Scores</h4>
           </div>
           <table className="data-table">
-            <thead><tr><th>#</th><th>Question</th><th>Score</th></tr></thead>
+            <thead><tr><th>#</th><th>Question</th></tr></thead>
             <tbody>
-              {s.questions.map((q, i) => {
-                const fb = feedbackList.find((f) => f.questionId === q.id);
-                const sc = fb?.score;
-                const color = sc !== undefined ? getScoreColor((sc / 10) * 100) : "#71717a";
-                return (
-                  <tr key={q.id}>
-                    <td className="font-mono text-zinc-600">{i + 1}</td>
-                    <td className="text-zinc-400 max-w-xs"><span className="line-clamp-2 text-xs">{questionText(q)}</span></td>
-                    <td>
-                      {sc !== undefined
-                        ? <span className="font-mono font-semibold text-sm" style={{ color }}>{sc.toFixed(1)}</span>
-                        : <span className="text-zinc-600 text-xs">—</span>}
-                    </td>
-                  </tr>
-                );
-              })}
+              {s.questions.map((q, i) => (
+                <tr key={q.id}>
+                  <td className="font-mono text-zinc-600">{i + 1}</td>
+                  <td className="text-zinc-400 max-w-xs">
+                    <span className="line-clamp-2 text-xs">{questionText(q)}</span>
+                  </td>
+                </tr>
+              ))}
             </tbody>
           </table>
         </div>
@@ -240,8 +232,8 @@ export default function InterviewSessionPage() {
     },
     onSuccess: (feedback) => {
       const fb = normFeedback(feedback);
-      setCurrentFeedback(fb);
-      setShowFeedback(true);
+      // Automatically proceed to next instead of showing feedback
+      handleNext();
       queryClient.setQueryData<InterviewSession>(["interview-session", sessionId], (old) =>
         old ? { ...old, feedback: [...(old.feedback ?? []), fb] } : old
       );
@@ -323,31 +315,26 @@ export default function InterviewSessionPage() {
         </motion.div>
       </AnimatePresence>
 
-      {/* Answer input or feedback */}
-      {!showFeedback ? (
-        <div className="space-y-4">
-          <Textarea label="Your Answer"
-            placeholder="Type your answer here… Be specific and use real examples."
-            className="h-40" value={answer} onChange={(e) => setAnswer(e.target.value)} showCount />
-          <Button variant="gradient" className="w-full"
-            onClick={() => submitMutation.mutate(answer)}
-            loading={submitMutation.isPending}
-            disabled={!answer.trim() || submitMutation.isPending}>
-            Submit Answer
-          </Button>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {currentFeedback && <FeedbackCard feedback={currentFeedback} />}
-          <Button variant="gradient" className="w-full" onClick={handleNext} loading={endMutation.isPending}>
-            {isLast ? (
-              <><Trophy className="h-4 w-4" />{endMutation.isPending ? "Finishing…" : "Finish Interview"}</>
-            ) : (
-              <>Next Question<ArrowRight className="h-4 w-4" /></>
-            )}
-          </Button>
-        </div>
-      )}
+      {/* Answer input */}
+      <div className="space-y-4">
+        <Textarea 
+          label="Your Answer"
+          placeholder="Type your answer here… Be specific and use real examples."
+          className="h-40" 
+          value={answer} 
+          onChange={(e) => setAnswer(e.target.value)} 
+          showCount 
+          disabled={submitMutation.isPending}
+        />
+        <Button 
+          variant="gradient" 
+          className="w-full"
+          onClick={() => submitMutation.mutate(answer)}
+          loading={submitMutation.isPending}
+          disabled={!answer.trim() || submitMutation.isPending}>
+          {isLast ? "Submit & Finish" : "Submit Answer"}
+        </Button>
+      </div>
     </div>
   );
 }

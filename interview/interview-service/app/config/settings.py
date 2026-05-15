@@ -17,11 +17,12 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 60
 
     # LLM Configuration
-    LLM_PROVIDER: str = "ollama"  # ollama | google | openai
+    LLM_PROVIDER: str = "openai"  # ollama | google | openai
     OPENAI_API_KEY: str = "sk-placeholder"
     OPENAI_BASE_URL: str | None = None
     GOOGLE_API_KEY: str = ""
-    LLM_MODEL: str = "llama3"
+    SECRET_KEY: str = "dev-secret-not-used-in-prod" # Only for /dev/token
+    LLM_MODEL: str = "gpt-4o-mini"
     LLM_TIMEOUT: int = 120          # bumped for local model latency
     LLM_MAX_RETRIES: int = 2
 

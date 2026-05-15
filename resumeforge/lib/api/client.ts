@@ -44,7 +44,7 @@ export function clearTokens() {
 
 const apiClient: AxiosInstance = axios.create({
   baseURL: config.apiBaseUrl,
-  timeout: 60000, // AI endpoints can be slow
+  timeout: 120000, // AI endpoints can be slow
 });
 
 

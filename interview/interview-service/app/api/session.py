@@ -59,7 +59,7 @@ async def get_session_report(
     return session
 
 
-@router.post("/{session_id}/end", response_model=SessionEndResponse)
+@router.post("/{session_id}/end", response_model=SessionOut)
 async def end(
     session_id: str,
     db: AsyncSession = Depends(get_db),
@@ -67,3 +67,15 @@ async def end(
 ):
     """End session, compute overall score, and generate summary report."""
     return await end_session(db, session_id, current_user.user_id)
+
+
+@router.delete("/{session_id}", status_code=204)
+async def delete(
+    session_id: str,
+    db: AsyncSession = Depends(get_db),
+    current_user: TokenData = Depends(get_current_user),
+):
+    """Permanently delete an interview session and all its responses."""
+    from app.services.session_service import delete_session
+    await delete_session(db, session_id, current_user.user_id)
+    return None

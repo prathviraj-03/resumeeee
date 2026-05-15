@@ -65,11 +65,20 @@ async def generate_resume_pdf(
     opt_dict = optimized.model_dump() if hasattr(optimized, "model_dump") else optimized
     orig_dict = original.model_dump() if hasattr(original, "model_dump") else original
 
+    # Extract contact info — try optimized first, then original profile
     opt_contact = opt_dict.get("contact")
     if opt_contact and opt_contact.get("name"):
         contact_info = opt_contact
     else:
-        contact_info = orig_dict.get("contact", {})
+        # Map master profile fields to the contact structure expected by templates
+        contact_info = {
+            "name": orig_dict.get("full_name") or orig_dict.get("name"),
+            "email": orig_dict.get("email"),
+            "phone": orig_dict.get("phone_number") or orig_dict.get("phone"),
+            "location": orig_dict.get("location"),
+            "linkedin": orig_dict.get("linkedin_url") or orig_dict.get("linkedin"),
+            "github": orig_dict.get("github_url") or orig_dict.get("github"),
+        }
 
     data = {
         "contact": contact_info,

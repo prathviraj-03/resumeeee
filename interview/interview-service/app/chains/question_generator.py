@@ -26,12 +26,12 @@ Follow these rules:
 
 Respond ONLY with valid JSON in the following exact format:
 [
-  {
+  {{
     "question_text": "<The actual question>",
     "category": "<A short label like 'Python', 'Leadership', or 'System Design'>",
     "difficulty": "<easy|medium|hard>",
     "follow_up_hint": "<An optional hint for the evaluator on what to look for in a good answer>"
-  }
+  }}
 ]
 Do not include any other text, markdown blocks, or explanation.
 """
@@ -86,8 +86,15 @@ async def generate_dynamic_questions(
             timeout=settings.LLM_TIMEOUT + 15,
         )
         
-        # Strip potential markdown fences
-        raw = raw.strip().strip("```json").strip("```").strip()
+        # Robust JSON extraction
+        import re
+        match = re.search(r'(\[.*\])', raw, re.DOTALL)
+        if match:
+            raw = match.group(1)
+        else:
+            # Fallback to stripping if no brackets found (maybe it's not an array?)
+            raw = raw.strip().strip("```json").strip("```").strip()
+            
         result = json.loads(raw)
         
         # Validate structure

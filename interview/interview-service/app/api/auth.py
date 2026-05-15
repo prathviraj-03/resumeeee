@@ -1,44 +1,27 @@
-"""
-auth.py — Lightweight JWT verification.
-In production, the Auth Service issues the token; this service only validates it.
-"""
-
-from fastapi import Depends, HTTPException, status
-from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
-from jose import JWTError, jwt
-
-from app.config.settings import settings
+from fastapi import Header, HTTPException, status
 from app.schemas.schemas import TokenData
 
-bearer_scheme = HTTPBearer()
-
-
 async def get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
+    x_user_id: str | None = Header(None),
 ) -> TokenData:
-    token = credentials.credentials
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Invalid or expired token",
-        headers={"WWW-Authenticate": "Bearer"},
-    )
-    try:
-        payload = jwt.decode(
-            token,
-            settings.SECRET_KEY,
-            algorithms=[settings.ALGORITHM],
+    """
+    Extract user identity from the X-User-Id header.
+    The API Gateway is responsible for JWT verification and injecting this header.
+    """
+    if not x_user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Missing User Identity (X-User-Id header)",
         )
-        user_id: str = payload.get("sub")
-        if user_id is None:
-            raise credentials_exception
-        return TokenData(user_id=user_id)
-    except JWTError:
-        raise credentials_exception
+    return TokenData(user_id=x_user_id)
 
 
 def create_access_token(user_id: str) -> str:
     """Utility — used by the /dev/token endpoint in development."""
+    from jose import jwt
     from datetime import datetime, timezone, timedelta
+    from app.config.settings import settings
+    
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
     )

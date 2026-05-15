@@ -102,7 +102,7 @@ async def _run_pipeline(job_id: str, profile: dict, job_description: str, templa
 
         await generate_resume_pdf(
             optimized=optimized,
-            original=optimized,      # profile already embedded in optimized data
+            original=profile,
             output_path=output_path,
             template_name=template_id,
         )

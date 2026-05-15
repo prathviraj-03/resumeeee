@@ -1,5 +1,6 @@
 import json
 import logging
+import math
 from app.config.settings import get_settings
 from app.utils.llm_client import get_ai_client, get_ai_model, supports_json_mode, build_system_prompt
 
@@ -82,20 +83,71 @@ def _parse_json(raw: str) -> dict:
         raise e
 
 
-def _call_kwargs(prompt: str, user_msg: str) -> dict:
+def _call_kwargs(prompt: str, user_msg: str, *, timeout_seconds: float, max_tokens: int | None = None) -> dict:
     """Build the kwargs dict for client.chat.completions.create."""
     kwargs: dict = dict(
         model=get_ai_model(),
         messages=[
             {"role": "system", "content": prompt},
-            {"role": "user",   "content": user_msg},
+            {"role": "user", "content": user_msg},
         ],
         temperature=0.2,
-        timeout=120.0,  # Explicitly allow more time for local models
+        timeout=timeout_seconds,
     )
+    if max_tokens is not None:
+        kwargs["max_tokens"] = max_tokens
     if supports_json_mode():
         kwargs["response_format"] = {"type": "json_object"}
     return kwargs
+
+
+def _fallback_resource_for(skill: str) -> str:
+    key = skill.lower()
+    if "postgres" in key:
+        return "https://www.postgresql.org/docs/"
+    if "mongo" in key:
+        return "https://www.mongodb.com/docs/"
+    if "microservice" in key:
+        return "https://microservices.io/patterns/index.html"
+    if "cloud" in key or "deploy" in key:
+        return "https://cloud.google.com/architecture"
+    if "agile" in key:
+        return "https://www.scrum.org/resources/what-is-scrum"
+    return "https://roadmap.sh/"
+
+
+def _build_fallback_roadmap(missing_skills: list[str], jd: str) -> dict:
+    cleaned_skills = [s.strip() for s in missing_skills if isinstance(s, str) and s.strip()]
+    if not cleaned_skills:
+        cleaned_skills = ["Core role skills"]
+
+    weeks_count = min(max(len(cleaned_skills), 2), 8)
+    chunksize = max(1, math.ceil(len(cleaned_skills) / weeks_count))
+    chunks = [cleaned_skills[i:i + chunksize] for i in range(0, len(cleaned_skills), chunksize)]
+
+    weeks = []
+    for index, group in enumerate(chunks, start=1):
+        items = []
+        for skill in group:
+            items.append({
+                "skill": skill,
+                "title": f"Build practical {skill} proficiency",
+                "description": f"Study fundamentals and complete one hands-on project focused on {skill}.",
+                "resource": _fallback_resource_for(skill),
+                "priority": "High" if index <= 2 else "Medium",
+            })
+
+        weeks.append({
+            "week_number": index,
+            "focus_area": ", ".join(group),
+            "items": items,
+        })
+
+    return {
+        "target_role": "Target role from job description",
+        "estimated_weeks": len(weeks),
+        "weeks": weeks,
+    }
 
 
 # ── Service functions ──────────────────────────────────────────────────────────
@@ -112,11 +164,16 @@ async def analyze_skill_gap(profile: dict, jd: str) -> dict:
 
     try:
         logger.info("Skill gap request → provider=%s model=%s", settings.LLM_PROVIDER, model)
-        response = await client.chat.completions.create(**_call_kwargs(GAP_ANALYSIS_PROMPT, user_msg))
+        response = await client.chat.completions.create(**_call_kwargs(
+            GAP_ANALYSIS_PROMPT,
+            user_msg,
+            timeout_seconds=90.0,
+            max_tokens=1200,
+        ))
         return _parse_json(response.choices[0].message.content or "")
     except Exception as e:
-        logger.error("Error in analyze_skill_gap [%s]: %s", settings.LLM_PROVIDER, str(e))
-        return {"error": str(e)}
+        logger.exception("Error in analyze_skill_gap [%s]: %s", settings.LLM_PROVIDER, str(e))
+        raise RuntimeError("Failed to analyze skill gap") from e
 
 
 async def generate_roadmap(missing_skills: list, jd: str) -> dict:
@@ -131,8 +188,14 @@ async def generate_roadmap(missing_skills: list, jd: str) -> dict:
 
     try:
         logger.info("Roadmap request → provider=%s model=%s", settings.LLM_PROVIDER, model)
-        response = await client.chat.completions.create(**_call_kwargs(ROADMAP_PROMPT, user_msg))
+        response = await client.chat.completions.create(**_call_kwargs(
+            ROADMAP_PROMPT,
+            user_msg,
+            timeout_seconds=90.0,
+            max_tokens=1400,
+        ))
         return _parse_json(response.choices[0].message.content or "")
     except Exception as e:
-        logger.error("Error in generate_roadmap [%s]: %s", settings.LLM_PROVIDER, str(e))
-        return {"error": str(e)}
+        logger.exception("Error in generate_roadmap [%s]: %s", settings.LLM_PROVIDER, str(e))
+        logger.warning("Returning fallback roadmap due to generation failure")
+        return _build_fallback_roadmap(missing_skills, jd)

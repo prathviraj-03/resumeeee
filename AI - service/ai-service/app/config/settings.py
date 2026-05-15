@@ -19,7 +19,7 @@ class Settings(BaseSettings):
 
     # ── LLM Provider Switch ──────────────────────────────────────
     # Options: "openai" | "ollama"
-    LLM_PROVIDER: str = "ollama"
+    LLM_PROVIDER: str = "openai"
 
     # ── OpenAI (kept for production / future use) ─────────────────
     OPENAI_API_KEY: str = ""

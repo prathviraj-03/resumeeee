@@ -1,15 +1,15 @@
 "use client";
 
 import React, { useState } from "react";
-import { useQuery, useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
-import { Mic, Plus, Clock, Star, ChevronRight, Code2, Users, Briefcase, Target } from "lucide-react";
+import { Mic, Plus, Clock, Star, ChevronRight, Code2, Users, Briefcase, Target, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { listSessions, startSession } from "@/lib/api/interview";
+import { listSessions, startSession, deleteSession } from "@/lib/api/interview";
 import { getErrorMessage } from "@/lib/api/error";
 import { cn, formatDate, DIFFICULTY_LABELS } from "@/lib/utils";
 import { getUserProfile } from "@/lib/api/profile";
@@ -165,9 +165,37 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
   );
 }
 
+function DeleteConfirmationModal({ open, onClose, onConfirm, isPending }: {
+  open: boolean; onClose: () => void;
+  onConfirm: () => void; isPending: boolean;
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center gap-2">
+            <Trash2 className="h-5 w-5 text-danger" />
+            Delete Interview
+          </DialogTitle>
+          <DialogDescription>
+            Are you sure you want to delete this interview session? This action cannot be undone and all results will be lost.
+          </DialogDescription>
+        </DialogHeader>
+        <DialogFooter className="mt-4">
+          <Button variant="outline" onClick={onClose} disabled={isPending}>Cancel</Button>
+          <Button variant="destructive" onClick={onConfirm} loading={isPending}>
+            Delete Permanently
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
 export default function InterviewPage() {
   const router = useRouter();
   const [configOpen, setConfigOpen] = useState(false);
+  const [deleteTarget, setDeleteTarget] = useState<string | null>(null);
 
   const { data: profile } = useQuery<UserProfile>({
     queryKey: ["profile"], queryFn: getUserProfile,
@@ -186,6 +214,22 @@ export default function InterviewPage() {
     },
     onError: (err) => toast.error(getErrorMessage(err)),
   });
+
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn: deleteSession,
+    onSuccess: () => {
+      toast.success("Interview session deleted");
+      setDeleteTarget(null);
+      queryClient.invalidateQueries({ queryKey: ["interview-sessions"] });
+    },
+    onError: (err) => toast.error(getErrorMessage(err)),
+  });
+
+  const handleDelete = (e: React.MouseEvent, id: string) => {
+    e.stopPropagation();
+    setDeleteTarget(id);
+  };
 
   return (
     <div className="max-w-4xl mx-auto">
@@ -252,7 +296,16 @@ export default function InterviewPage() {
                       <span className="text-xs text-zinc-600">/10</span>
                     </div>
                   )}
-                  <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                  <div className="flex items-center gap-2">
+                    <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
+                    <button 
+                      onClick={(e) => handleDelete(e, s.id)}
+                      className="p-2 hover:bg-danger/10 text-zinc-600 hover:text-danger transition-colors rounded-lg"
+                      title="Delete interview"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </button>
+                  </div>
                 </div>
               </motion.div>
             );
@@ -263,6 +316,13 @@ export default function InterviewPage() {
       <ConfigModal open={configOpen} onClose={() => setConfigOpen(false)}
         onStart={(cfg) => { setConfigOpen(false); startMutation.mutate({ ...cfg, profileData: profile }); }}
         isPending={startMutation.isPending} />
+
+      <DeleteConfirmationModal 
+        open={!!deleteTarget} 
+        onClose={() => setDeleteTarget(null)}
+        onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
+        isPending={deleteMutation.isPending}
+      />
     </div>
   );
 }

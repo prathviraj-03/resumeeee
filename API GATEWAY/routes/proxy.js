@@ -66,8 +66,8 @@ const setupProxy = (app) => {
             target: service.target,
             changeOrigin: true,
             // ── Increase timeouts for the AI service (OpenAI call can take ~15s) ──
-            proxyTimeout: 60000,   // 60s — wait for upstream
-            timeout: 65000,        // 65s — socket timeout (slightly longer)
+            proxyTimeout: 120000,   // 120s — wait for upstream
+            timeout: 130000,        // 130s — socket timeout (slightly longer)
 
             pathRewrite: (path, req) => {
                 let rewrittenPath;

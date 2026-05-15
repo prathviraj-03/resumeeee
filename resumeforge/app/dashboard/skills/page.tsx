@@ -6,14 +6,14 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { motion } from "framer-motion";
-import { Brain, CheckCircle2, AlertCircle, Clock, ExternalLink, BookOpen, Map, Target, ArrowRight } from "lucide-react";
+import { Brain, CheckCircle2, AlertCircle, Clock, ExternalLink, BookOpen, Map, Target } from "lucide-react";
 import { toast } from "sonner";
 import { runGapAnalysis, getRoadmap } from "@/lib/api/skills";
 import { getUserProfile } from "@/lib/api/profile";
 import { getErrorMessage, isRateLimitError } from "@/lib/api/error";
 import { config } from "@/lib/config";
 import { cn } from "@/lib/utils";
-import type { GapAnalysisResult, Skill, UserProfile } from "@/lib/api/types";
+import type { GapAnalysisResult, UserProfile } from "@/lib/api/types";
 import type { RoadmapResponse } from "@/lib/api/skills";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -32,6 +32,17 @@ function normaliseGap(raw: GapAnalysisResult) {
   const cats = raw.skillCategories ?? [];
   const score = raw.overallScore ?? raw.overall_score ?? 0;
   return { present, partial, missing, categories: cats, score };
+}
+
+function isValidRoadmap(data: unknown): data is RoadmapResponse {
+  const r = data as Partial<RoadmapResponse> | null;
+  if (!r || !Array.isArray(r.weeks)) return false;
+
+  return r.weeks.every((week) => (
+    typeof week?.week_number === "number" &&
+    typeof week?.focus_area === "string" &&
+    Array.isArray(week?.items)
+  ));
 }
 
 export default function SkillsPage() {
@@ -55,34 +66,52 @@ export default function SkillsPage() {
         currentSkills: profile?.skills || []
       });
     },
-    onSuccess: (data) => { 
-      setGapResult(data); 
+    onSuccess: (data) => {
+      roadmapMutation.reset();
+      setGapResult(data);
       setActiveTab("analysis");
-      toast.success("Skill gap analysis complete!"); 
+
+      const { missing } = normaliseGap(data);
+      if (!missing.length) {
+        toast.success("Skill gap analysis complete. No missing skills found.");
+        return;
+      }
+
+      toast.success("Skill gap analysis complete! Generating roadmap...");
+      roadmapMutation.mutate({
+        missingSkills: missing,
+        jobDescription: jdValue,
+      });
     },
     onError: (err) => toast.error(isRateLimitError(err) ? "Rate limit — please wait." : getErrorMessage(err)),
   });
 
   const roadmapMutation = useMutation({
-    mutationFn: async () => {
-      if (!gapResult) throw new Error("Please run analysis first");
-      const { missing } = normaliseGap(gapResult);
-      if (!missing.length) throw new Error("No missing skills to build a roadmap for!");
+    mutationFn: async (payload: { missingSkills: string[]; jobDescription: string }) => {
+      if (!payload.missingSkills.length) throw new Error("No missing skills to build a roadmap for.");
       return getRoadmap({
-        jobDescription: jdValue,
+        jobDescription: payload.jobDescription,
         profileData: profile,
-        currentSkills: missing // Passing missing skills to generator
+        currentSkills: payload.missingSkills,
       });
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
+      if (!isValidRoadmap(data)) {
+        setActiveTab("analysis");
+        toast.error("Roadmap data is incomplete. Please try again.");
+        return;
+      }
       setActiveTab("roadmap");
       toast.success("Learning roadmap generated!");
     },
-    onError: (err) => toast.error(getErrorMessage(err)),
+    onError: (err) => {
+      setActiveTab("analysis");
+      toast.error(err instanceof Error ? err.message : getErrorMessage(err));
+    },
   });
 
-  const rData = roadmapMutation.data;
-  const { present, partial, missing, score } = gapResult ? normaliseGap(gapResult) : { present:[], partial:[], missing:[], score:0 };
+  const rData = isValidRoadmap(roadmapMutation.data) ? roadmapMutation.data : null;
+  const { present, partial, missing } = gapResult ? normaliseGap(gapResult) : { present:[], partial:[], missing:[] };
 
   return (
     <div className="max-w-5xl mx-auto">
@@ -113,9 +142,9 @@ export default function SkillsPage() {
           />
           
           <div className="flex justify-end pt-2">
-            <Button type="submit" variant="gradient" loading={analyzeMutation.isPending} disabled={profileLoading}>
+            <Button type="submit" variant="gradient" loading={analyzeMutation.isPending || roadmapMutation.isPending} disabled={profileLoading || roadmapMutation.isPending}>
               <Brain className="h-4 w-4" />
-              {analyzeMutation.isPending ? "Analysing Profile…" : "Analyse Skill Gap"}
+              {analyzeMutation.isPending || roadmapMutation.isPending ? "Analysing Profile…" : "Analyse Skill Gap"}
             </Button>
           </div>
         </form>
@@ -170,7 +199,7 @@ export default function SkillsPage() {
                   <h4 className="text-sm font-medium text-zinc-200">Bridge the Gap</h4>
                   <p className="text-xs text-zinc-500 mt-1">Let AI generate a week-by-week learning roadmap with real courses and resources.</p>
                 </div>
-                <Button variant="gradient" onClick={() => roadmapMutation.mutate()} loading={roadmapMutation.isPending}>
+                <Button variant="gradient" onClick={() => roadmapMutation.mutate({ missingSkills: missing, jobDescription: jdValue })} loading={roadmapMutation.isPending}>
                   <Map className="h-4 w-4" /> Generate Roadmap
                 </Button>
               </div>
@@ -199,7 +228,7 @@ export default function SkillsPage() {
               {/* Timeline Line */}
               <div className="absolute left-4 top-4 bottom-4 w-px bg-primary-500/20" />
               
-              {rData.weeks.map((week, wIdx) => (
+              {rData.weeks.map((week) => (
                 <div key={week.week_number} className="relative flex gap-6 mb-8 last:mb-0">
                   {/* Timeline Dot */}
                   <div className="relative z-10 flex shrink-0 items-center justify-center h-8 w-8 rounded-full bg-primary-500 text-black font-bold text-sm shadow-[0_0_15px_rgba(99,102,241,0.5)]">

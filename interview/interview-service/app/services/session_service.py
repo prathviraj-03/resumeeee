@@ -18,7 +18,7 @@ from app.models.models import (
 )
 from app.schemas.schemas import (
     SessionStartRequest, SessionStartResponse, SessionOut,
-    SessionListItem, SessionEndResponse, QuestionOut,
+    SessionListItem, SessionEndResponse, QuestionOut, ResponseOut,
 )
 from app.chains.eval_chain import generate_session_summary
 from app.config.redis_client import get_redis
@@ -137,6 +137,7 @@ async def start_session(
     await db.flush()
 
     return SessionStartResponse(
+        id=session.session_id,
         session_id=session.session_id,
         session_type=session.session_type,
         questions=[QuestionOut.model_validate(q) for q in questions],
@@ -161,7 +162,35 @@ async def get_session(
     if not session:
         from fastapi import HTTPException
         raise HTTPException(status_code=404, detail="Session not found")
-    return SessionOut.model_validate(session)
+    
+    # Hydrate questions from question_order
+    questions_list = []
+    if session.question_order:
+        try:
+            q_ids = [uuid.UUID(qid) for qid in json.loads(session.question_order)]
+            q_result = await db.execute(
+                select(QuestionBank).where(QuestionBank.question_id.in_(q_ids))
+            )
+            questions_map = {q.question_id: q for q in q_result.scalars().all()}
+            # Maintain order
+            questions_list = [questions_map[qid] for qid in q_ids if qid in questions_map]
+        except Exception as e:
+            logger.error("Failed to hydrate questions for session %s: %s", session_id, e)
+    
+    # Construct response manually to be safe with field names/aliases
+    return SessionOut(
+        id=session.session_id,
+        session_id=session.session_id,
+        user_id=session.user_id,
+        session_type=session.session_type,
+        overall_score=session.overall_score,
+        summary_report=session.summary_report,
+        status=session.status,
+        start_time=session.start_time,
+        end_time=session.end_time,
+        questions=[QuestionOut.model_validate(q) for q in questions_list],
+        responses=[ResponseOut.model_validate(r) for r in session.responses]
+    )
 
 
 async def list_sessions(
@@ -235,12 +264,29 @@ async def end_session(
     session.summary_report = summary
     session.status = "completed"
     session.end_time = datetime.now(timezone.utc)
-    await db.flush()
+    await db.commit()
 
-    return SessionEndResponse(
-        session_id=session.session_id,
-        overall_score=overall_score,
-        summary_report=summary,
-        end_time=session.end_time,
-        responses_evaluated=len(scored),
+    return await get_session(db, str(session.session_id), user_id)
+
+
+async def delete_session(
+    db: AsyncSession,
+    session_id: str,
+    user_id: str,
+) -> bool:
+    result = await db.execute(
+        select(InterviewSession).where(
+            InterviewSession.session_id == uuid.UUID(session_id),
+            InterviewSession.user_id == uuid.UUID(user_id),
+        )
     )
+    session = result.scalar_one_or_none()
+    if not session:
+        from fastapi import HTTPException
+        raise HTTPException(status_code=404, detail="Session not found")
+    
+    # SQLAlchemy will cascade delete responses if configured, but let's be safe
+    # If using selectinload/relationship, it handles it.
+    await db.delete(session)
+    await db.commit()
+    return True

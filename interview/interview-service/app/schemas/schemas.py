@@ -8,13 +8,18 @@ from app.models.models import SessionType, Difficulty
 # ── Question Bank ──────────────────────────────────────────────────────────
 
 class QuestionOut(BaseModel):
+    id: UUID4 = Field(serialization_alias="id", validation_alias="question_id")
     question_id: UUID4
+    text: str = Field(serialization_alias="text", validation_alias="question_text")
     question_text: str
     category: str
     difficulty: Difficulty
     session_type: SessionType
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
 
 # ── Session ────────────────────────────────────────────────────────────────
@@ -29,15 +34,20 @@ class SessionStartRequest(BaseModel):
 
 
 class SessionStartResponse(BaseModel):
+    id: UUID4 = Field(serialization_alias="id", validation_alias="session_id")
     session_id: UUID4
     session_type: SessionType
     questions: List[QuestionOut]
     start_time: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
 
 class SessionOut(BaseModel):
+    id: UUID4 = Field(serialization_alias="id", validation_alias="session_id")
     session_id: UUID4
     user_id: UUID4
     session_type: SessionType
@@ -46,12 +56,17 @@ class SessionOut(BaseModel):
     status: str
     start_time: datetime
     end_time: Optional[datetime]
+    questions: List[QuestionOut] = []
     responses: List[ResponseOut] = []
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
 
 class SessionListItem(BaseModel):
+    id: UUID4 = Field(serialization_alias="id", validation_alias="session_id")
     session_id: UUID4
     session_type: SessionType
     overall_score: Optional[int]
@@ -59,7 +74,10 @@ class SessionListItem(BaseModel):
     start_time: datetime
     end_time: Optional[datetime]
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
 
 # ── Answer / Response ──────────────────────────────────────────────────────
@@ -82,9 +100,15 @@ class AnswerSubmitResponse(BaseModel):
     score_for_question: int
     ai_feedback: str
     breakdown: EvaluationBreakdown
+    
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
 
 class ResponseOut(BaseModel):
+    id: UUID4 = Field(serialization_alias="id", validation_alias="response_id")
     response_id: UUID4
     question_id: UUID4
     user_answer_text: Optional[str]
@@ -94,7 +118,10 @@ class ResponseOut(BaseModel):
     evaluation_breakdown: Optional[str]
     created_at: datetime
 
-    model_config = {"from_attributes": True}
+    model_config = {
+        "from_attributes": True,
+        "populate_by_name": True
+    }
 
 
 # ── Session End ────────────────────────────────────────────────────────────

@@ -52,11 +52,12 @@ const NAV_ITEMS = [
     href: "/dashboard/profile",
     icon: User,
   },
-  {
-    label: "Resumes",
-    href: "/dashboard/resume",
-    icon: FileText,
-  },
+  // ─ Resume section hidden ─
+  // {
+  //   label: "Resumes",
+  //   href: "/dashboard/resume",
+  //   icon: FileText,
+  // },
   {
     label: "ATS Score",
     href: "/dashboard/ats-score",
@@ -279,7 +280,7 @@ function TopBar({ pageTitle }: { pageTitle: string }) {
 function getPageTitle(pathname: string): string {
   const map: Record<string, string> = {
     "/dashboard": "Dashboard",
-    "/dashboard/resume": "Resume Management",
+    // "/dashboard/resume": "Resume Management",
     "/dashboard/ats-score": "ATS Scorer",
     "/dashboard/optimize": "Tailored Resume",
     "/dashboard/templates": "Resume Templates",

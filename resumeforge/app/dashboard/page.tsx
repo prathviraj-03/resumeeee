@@ -14,7 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn, formatRelativeTime } from "@/lib/utils";
-import { listResumes } from "@/lib/api/resume";
+// import { listResumes } from "@/lib/api/resume"; // Hidden: resume section disabled
 import { listSessions } from "@/lib/api/interview";
 import type { ActivityType } from "@/lib/api/types";
 
@@ -73,17 +73,20 @@ export default function DashboardPage() {
   const { user } = useAuthStore();
 
   // Derive stats from real service data
-  const { data: resumes, isLoading: resumesLoading } = useQuery({
-    queryKey: ["resumes"],
-    queryFn: listResumes,
-  });
+  // Hidden: resume section disabled
+  const resumes = undefined;
+  const resumesLoading = false;
+  // const { data: resumes, isLoading: resumesLoading } = useQuery({
+  //   queryKey: ["resumes"],
+  //   queryFn: listResumes,
+  // });
 
   const { data: sessions, isLoading: sessionsLoading } = useQuery({
     queryKey: ["interview-sessions"],
     queryFn: listSessions,
   });
 
-  const statsLoading = resumesLoading || sessionsLoading;
+  const statsLoading = false || sessionsLoading; // Hidden: resume section disabled
 
   const completedSessions = sessions?.filter((s) => s.status === "completed") ?? [];
   const bestScore = completedSessions.length
@@ -91,7 +94,7 @@ export default function DashboardPage() {
     : 0;
 
   const statCards = [
-    { label: "Resumes Uploaded", value: resumes?.length ?? 0, icon: FileText, color: "bg-primary-500/10 text-primary-400" },
+    // { label: "Resumes Uploaded", value: resumes?.length ?? 0, icon: FileText, color: "bg-primary-500/10 text-primary-400" }, // Hidden: resume section disabled
     { label: "Best Interview Score", value: bestScore ? `${bestScore.toFixed(1)}/10` : "—", icon: Target, color: "bg-warning/10 text-warning" },
     { label: "Interviews Done", value: completedSessions.length, icon: Mic, color: "bg-danger/10 text-danger" },
     { label: "Sessions Started", value: sessions?.length ?? 0, icon: Brain, color: "bg-success/10 text-success" },
@@ -99,12 +102,13 @@ export default function DashboardPage() {
 
   // Build activity feed from real data
   const recentActivity = [
-    ...(resumes?.slice(0, 2).map((r) => ({
-      id: r.id,
-      type: "resume_upload" as ActivityType,
-      description: `Uploaded ${r.filename ?? r.original_filename ?? "resume"}`,
-      timestamp: r.uploadedAt ?? r.uploaded_at ?? r.createdAt ?? r.created_at ?? new Date().toISOString(),
-    })) ?? []),
+    // Hidden: resume section disabled
+    // ...(resumes?.slice(0, 2).map((r) => ({
+    //   id: r.id,
+    //   type: "resume_upload" as ActivityType,
+    //   description: `Uploaded ${r.filename ?? r.original_filename ?? "resume"}`,
+    //   timestamp: r.uploadedAt ?? r.uploaded_at ?? r.createdAt ?? r.created_at ?? new Date().toISOString(),
+    // })) ?? []),
     ...(completedSessions.slice(0, 3).map((s) => ({
       id: s.id,
       type: "interview_completed" as ActivityType,
