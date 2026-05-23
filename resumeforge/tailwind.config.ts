@@ -70,25 +70,22 @@ const config: Config = {
         },
         // ResumeForge Design System
         surface: {
-          DEFAULT: "#0F0F11",
-          card: "#18181B",
-          elevated: "#1C1C1F",
-          border: "#27272A",
+          DEFAULT: "hsl(var(--background))",
+          card: "hsl(var(--card))",
+          elevated: "hsl(var(--popover))",
+          border: "hsl(var(--border))",
         },
         success: {
           DEFAULT: "#22C55E",
           muted: "#16A34A",
-          bg: "rgba(34, 197, 94, 0.1)",
         },
         warning: {
           DEFAULT: "#F59E0B",
           muted: "#D97706",
-          bg: "rgba(245, 158, 11, 0.1)",
         },
         danger: {
           DEFAULT: "#EF4444",
           muted: "#DC2626",
-          bg: "rgba(239, 68, 68, 0.1)",
         },
         zinc: {
           50: "#fafafa",
@@ -125,13 +122,12 @@ const config: Config = {
         "120": "30rem",
       },
       boxShadow: {
-        card: "0 0 0 1px rgba(255,255,255,0.05), 0 2px 4px rgba(0,0,0,0.3)",
-        "card-hover":
-          "0 0 0 1px rgba(99,102,241,0.3), 0 4px 16px rgba(0,0,0,0.4)",
-        glow: "0 0 20px rgba(99, 102, 241, 0.3)",
-        "glow-sm": "0 0 10px rgba(99, 102, 241, 0.2)",
-        "glow-lg": "0 0 40px rgba(99, 102, 241, 0.4)",
-        inner: "inset 0 1px 0 rgba(255,255,255,0.05)",
+        card: "var(--shadow-card)",
+        "card-hover": "var(--shadow-card-hover)",
+        glow: "var(--shadow-glow)",
+        "glow-sm": "var(--shadow-glow-sm)",
+        "glow-lg": "var(--shadow-glow-lg)",
+        inner: "inset 0 1px 0 hsla(var(--foreground), 0.05)",
       },
       keyframes: {
         "accordion-down": {
@@ -184,9 +180,9 @@ const config: Config = {
         "primary-gradient":
           "linear-gradient(135deg, #6366f1 0%, #4f46e5 50%, #4338ca 100%)",
         "card-gradient":
-          "linear-gradient(135deg, #18181B 0%, #1C1C1F 100%)",
+          "linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--popover)) 100%)",
         "shimmer-gradient":
-          "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.05) 50%, transparent 100%)",
+          "linear-gradient(90deg, transparent 0%, hsla(var(--foreground), 0.05) 50%, transparent 100%)",
         "score-gradient":
           "linear-gradient(90deg, #EF4444 0%, #F59E0B 50%, #22C55E 100%)",
       },

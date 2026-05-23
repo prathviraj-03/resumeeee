@@ -145,20 +145,20 @@ function SessionSummary({ session }: { session: InterviewSession }) {
           <div className="h-16 w-16 rounded-2xl bg-primary-500/10 flex items-center justify-center mx-auto mb-4">
             <Trophy className="h-8 w-8 text-primary-400" />
           </div>
-          <h3 className="text-xl font-bold text-zinc-100 mb-1">Interview Complete!</h3>
-          <p className="text-sm text-zinc-500 mb-6">
+          <h3 className="text-xl font-bold text-foreground mb-1">Interview Complete!</h3>
+          <p className="text-sm text-muted-foreground mb-6">
             {s.type ? INTERVIEW_TYPE_LABELS[s.type] : s.role ?? "Interview"} · {s.questions?.length ?? 0} questions
           </p>
           <div className="inline-flex items-baseline gap-1">
             <span className="text-5xl font-bold font-mono" style={{ color: overallColor }}>{overall.toFixed(1)}</span>
-            <span className="text-xl text-zinc-600">/10</span>
+            <span className="text-xl text-muted-foreground">/10</span>
           </div>
           <div className="text-sm mt-1" style={{ color: overallColor }}>
             {overall >= 8 ? "Excellent" : overall >= 6 ? "Good" : overall >= 4 ? "Fair" : "Needs Work"}
           </div>
           {/* Executive summary from backend */}
           {(s.summary ?? s.executive_summary) && (
-            <p className="mt-4 text-xs text-zinc-500 max-w-md mx-auto leading-relaxed bg-zinc-800/40 rounded-lg p-3">
+            <p className="mt-4 text-xs text-muted-foreground max-w-md mx-auto leading-relaxed bg-secondary/40 rounded-lg p-3">
               {s.summary ?? s.executive_summary}
             </p>
           )}
@@ -168,8 +168,8 @@ function SessionSummary({ session }: { session: InterviewSession }) {
       {/* Radar chart */}
       {radar.length > 0 && (
         <div className="rf-card p-6">
-          <h4 className="text-sm font-semibold text-zinc-300 mb-4 flex items-center gap-2">
-            <BarChart3 className="h-4 w-4 text-primary-400" />Performance Breakdown
+          <h4 className="text-sm font-semibold text-foreground mb-4 flex items-center gap-2">
+            <BarChart3 className="h-4 w-4 text-primary" />Performance Breakdown
           </h4>
           <ResponsiveContainer width="100%" height={240}>
             <RadarChart data={radar}>
@@ -184,16 +184,16 @@ function SessionSummary({ session }: { session: InterviewSession }) {
       {/* Per-question breakdown */}
       {feedbackList.length > 0 && s.questions?.length > 0 && (
         <div className="rf-card overflow-hidden">
-          <div className="px-5 py-4 border-b border-surface-border">
-            <h4 className="text-sm font-semibold text-zinc-300">Per-Question Scores</h4>
+          <div className="px-5 py-4 border-b border-border">
+            <h4 className="text-sm font-semibold text-foreground">Per-Question Feedback</h4>
           </div>
           <table className="data-table">
             <thead><tr><th>#</th><th>Question</th></tr></thead>
             <tbody>
               {s.questions.map((q, i) => (
                 <tr key={q.id}>
-                  <td className="font-mono text-zinc-600">{i + 1}</td>
-                  <td className="text-zinc-400 max-w-xs">
+                  <td className="font-mono text-muted-foreground">{i + 1}</td>
+                  <td className="text-muted-foreground max-w-xs">
                     <span className="line-clamp-2 text-xs">{questionText(q)}</span>
                   </td>
                 </tr>

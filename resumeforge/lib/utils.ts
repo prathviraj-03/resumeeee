@@ -70,6 +70,16 @@ export function getInitials(name: string): string {
     .slice(0, 2);
 }
 
+export function getDisplayName(user: { fullName?: string; full_name?: string; email?: string } | null): string {
+  if (!user) return "there";
+  const name = user.fullName || user.full_name || "";
+  // If name is present and doesn't look like an email, use it
+  if (name && !name.includes("@")) return name;
+  // Fallback to email prefix
+  if (user.email) return user.email.split("@")[0];
+  return "there";
+}
+
 export function sleep(ms: number): Promise<void> {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }

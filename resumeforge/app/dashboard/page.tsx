@@ -13,7 +13,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn, formatRelativeTime } from "@/lib/utils";
+import { cn, formatRelativeTime, getDisplayName } from "@/lib/utils";
 // import { listResumes } from "@/lib/api/resume"; // Hidden: resume section disabled
 import { listSessions } from "@/lib/api/interview";
 import type { ActivityType } from "@/lib/api/types";
@@ -60,8 +60,8 @@ function StatCard({ label, value, icon: Icon, color, loading }: {
             <div className={cn("h-10 w-10 rounded-xl flex items-center justify-center mb-4", color)}>
               <Icon className="h-5 w-5" />
             </div>
-            <div className="text-3xl font-bold text-zinc-100 font-mono mb-1">{value}</div>
-            <div className="text-sm text-zinc-500">{label}</div>
+            <div className="text-3xl font-bold text-foreground font-mono mb-1">{value}</div>
+            <div className="text-sm text-muted-foreground">{label}</div>
           </>
         )}
       </CardContent>
@@ -119,7 +119,7 @@ export default function DashboardPage() {
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 5);
 
-  const displayName = user?.fullName || user?.full_name || "there";
+  const displayName = getDisplayName(user);
 
   return (
     <div className="max-w-6xl mx-auto space-y-8">
@@ -131,11 +131,11 @@ export default function DashboardPage() {
           <div>
             <div className="flex items-center gap-2 mb-2">
               <span className="text-2xl">👋</span>
-              <h2 className="text-2xl font-bold text-zinc-100">
+              <h2 className="text-2xl font-bold text-foreground">
                 Welcome back, {displayName.split(" ")[0]}!
               </h2>
             </div>
-            <p className="text-zinc-500 text-sm max-w-lg">
+            <p className="text-muted-foreground text-sm max-w-lg">
               Your AI-powered career dashboard. Optimize your resume, practice interviews, and close skill gaps.
             </p>
           </div>
@@ -173,10 +173,10 @@ export default function DashboardPage() {
                         <action.icon className="h-4 w-4 text-white" />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <div className="text-sm font-medium text-zinc-200 group-hover:text-zinc-100 transition-colors">{action.label}</div>
-                        <div className="text-xs text-zinc-600 truncate">{action.description}</div>
+                        <div className="text-sm font-medium text-foreground group-hover:text-primary transition-colors">{action.label}</div>
+                        <div className="text-xs text-muted-foreground truncate">{action.description}</div>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-zinc-600 group-hover:text-primary-400 group-hover:translate-x-0.5 transition-all shrink-0" />
+                      <ArrowRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0" />
                     </div>
                   </div>
                 </Link>
@@ -214,8 +214,8 @@ export default function DashboardPage() {
                       <Icon className="h-3.5 w-3.5" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-xs text-zinc-300 leading-relaxed">{item.description}</p>
-                      <p className="text-xs text-zinc-600 mt-0.5 flex items-center gap-1">
+                      <p className="text-xs text-foreground leading-relaxed">{item.description}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5 flex items-center gap-1">
                         <Clock className="h-3 w-3" />{formatRelativeTime(item.timestamp)}
                       </p>
                     </div>

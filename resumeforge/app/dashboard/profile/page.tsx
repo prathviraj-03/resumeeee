@@ -77,7 +77,7 @@ function TagInput({ label, values, onChange }: { label: string; values: string[]
   };
   return (
     <div className="space-y-3">
-      <label className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">{label}</label>
+      <label className="text-xs font-semibold text-muted-foreground uppercase tracking-widest">{label}</label>
       <div className="flex gap-2">
         <Input placeholder={`Add ${label.toLowerCase()}…`} value={input}
           onChange={e => setInput(e.target.value)}
@@ -86,15 +86,15 @@ function TagInput({ label, values, onChange }: { label: string; values: string[]
       </div>
       <div className="flex flex-wrap gap-2">
         {values.map(v => (
-          <Badge key={v} className="pl-3 pr-1 py-1 gap-2 bg-zinc-800 text-zinc-300 border-zinc-700">
+          <Badge key={v} className="pl-3 pr-1 py-1 gap-2 bg-secondary text-foreground border-border">
             {v}
             <button type="button" onClick={() => onChange(values.filter(x => x !== v))}
-              className="p-0.5 rounded-full hover:text-red-400 text-zinc-500 transition-colors">
+              className="p-0.5 rounded-full hover:text-destructive text-muted-foreground/60 transition-colors">
               <Trash2 className="h-3 w-3" />
             </button>
           </Badge>
         ))}
-        {values.length === 0 && <p className="text-xs text-zinc-600 italic">None added yet.</p>}
+        {values.length === 0 && <p className="text-xs text-muted-foreground/60 italic">None added yet.</p>}
       </div>
     </div>
   );
@@ -181,20 +181,20 @@ export default function ProfilePage() {
             <button key={t.id} onClick={() => setTab(t.id)}
               className={cn("w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all text-sm font-medium",
                 tab === t.id
-                  ? "bg-primary-500/10 text-primary-400 border border-primary-500/20"
-                  : "text-zinc-500 hover:bg-zinc-800/50 hover:text-zinc-300 border border-transparent")}>
-              <t.icon className={cn("h-4 w-4", tab === t.id ? "text-primary-400" : "text-zinc-600")} />
+                  ? "bg-primary/10 text-primary border border-primary/20"
+                  : "text-muted-foreground hover:bg-secondary/50 hover:text-foreground border border-transparent")}>
+              <t.icon className={cn("h-4 w-4", tab === t.id ? "text-primary" : "text-muted-foreground/60")} />
               {t.label}
               {tab === t.id && <ChevronRight className="ml-auto h-3 w-3" />}
             </button>
           ))}
 
-          <div className="mt-6 p-4 rounded-2xl bg-zinc-800/30 border border-surface-border">
+          <div className="mt-6 p-4 rounded-2xl bg-secondary/30 border border-border">
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="h-4 w-4 text-warning" />
-              <span className="text-xs font-bold text-zinc-300 uppercase">AI Power</span>
+              <span className="text-xs font-bold text-foreground uppercase">AI Power</span>
             </div>
-            <p className="text-[11px] text-zinc-500 leading-relaxed">
+            <p className="text-[11px] text-muted-foreground leading-relaxed">
               Complete all sections so our AI can generate high-scoring resumes for any job in seconds.
             </p>
           </div>
@@ -210,13 +210,13 @@ export default function ProfilePage() {
                 <motion.div key="identity" {...slide} className="rf-card p-8 space-y-6">
                   <div className="flex items-center gap-5 mb-2">
                     <div className="h-16 w-16 rounded-2xl bg-primary-gradient p-0.5 shadow-glow-sm">
-                      <div className="h-full w-full rounded-[14px] bg-zinc-900 flex items-center justify-center text-xl font-bold text-primary-400">
+                      <div className="h-full w-full rounded-[14px] bg-background flex items-center justify-center text-xl font-bold text-primary">
                         {initials}
                       </div>
                     </div>
                     <div>
-                      <h3 className="text-lg font-bold text-zinc-100">{displayName}</h3>
-                      <p className="text-sm text-zinc-500">{authData?.email}</p>
+                      <h3 className="text-lg font-bold text-foreground">{displayName}</h3>
+                      <p className="text-sm text-muted-foreground">{authData?.email}</p>
                     </div>
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
@@ -235,7 +235,7 @@ export default function ProfilePage() {
               {/* ── CAREER INTENT ─────────────────────────────────────────── */}
               {tab === "career" && (
                 <motion.div key="career" {...slide} className="rf-card p-8 space-y-6">
-                  <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Career Intent</h3>
+                  <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Career Intent</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                     <Input label="Target Role"         {...register("target_role")}     leftIcon={<Target className="h-4 w-4" />} placeholder="e.g. Software Engineer" />
                     <Input label="Target Industry"     {...register("target_industry")} leftIcon={<Briefcase className="h-4 w-4" />} placeholder="e.g. FinTech, Healthcare" />
@@ -248,22 +248,22 @@ export default function ProfilePage() {
               {tab === "experience" && (
                 <motion.div key="experience" {...slide} className="space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Work History</h3>
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Work History</h3>
                     <Button type="button" size="sm" variant="outline"
                       onClick={() => addExp({ title: "", company: "", duration: "", description: "" })}>
                       <Plus className="h-3.5 w-3.5 mr-1" />Add
                     </Button>
                   </div>
                   {expF.length === 0 && (
-                    <div className="rf-card p-12 text-center border-dashed border-zinc-800">
-                      <Briefcase className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
-                      <p className="text-sm text-zinc-500">No experience added yet.</p>
+                    <div className="rf-card p-12 text-center border-dashed border-border">
+                      <Briefcase className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No experience added yet.</p>
                     </div>
                   )}
                   {expF.map((f, i) => (
                     <div key={f.id} className="rf-card p-6 relative group space-y-4">
                       <button type="button" onClick={() => rmExp(i)}
-                        className="absolute top-4 right-4 p-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+                        className="absolute top-4 right-4 p-2 text-muted-foreground/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -282,22 +282,22 @@ export default function ProfilePage() {
               {tab === "education" && (
                 <motion.div key="education" {...slide} className="space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Education</h3>
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Education</h3>
                     <Button type="button" size="sm" variant="outline"
                       onClick={() => addEdu({ degree: "", institution: "", year: "", cgpa: "" })}>
                       <Plus className="h-3.5 w-3.5 mr-1" />Add
                     </Button>
                   </div>
                   {eduF.length === 0 && (
-                    <div className="rf-card p-12 text-center border-dashed border-zinc-800">
-                      <GraduationCap className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
-                      <p className="text-sm text-zinc-500">No education added yet.</p>
+                    <div className="rf-card p-12 text-center border-dashed border-border">
+                      <GraduationCap className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No education added yet.</p>
                     </div>
                   )}
                   {eduF.map((f, i) => (
                     <div key={f.id} className="rf-card p-6 relative group">
                       <button type="button" onClick={() => rmEdu(i)}
-                        className="absolute top-4 right-4 p-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+                        className="absolute top-4 right-4 p-2 text-muted-foreground/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -315,22 +315,22 @@ export default function ProfilePage() {
               {tab === "projects" && (
                 <motion.div key="projects" {...slide} className="space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Projects</h3>
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Projects</h3>
                     <Button type="button" size="sm" variant="outline"
                       onClick={() => addProj({ name: "", description: "", tech_stack: "", url: "" })}>
                       <Plus className="h-3.5 w-3.5 mr-1" />Add
                     </Button>
                   </div>
                   {projF.length === 0 && (
-                    <div className="rf-card p-12 text-center border-dashed border-zinc-800">
-                      <FolderGit2 className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
-                      <p className="text-sm text-zinc-500">No projects added yet.</p>
+                    <div className="rf-card p-12 text-center border-dashed border-border">
+                      <FolderGit2 className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No projects added yet.</p>
                     </div>
                   )}
                   {projF.map((f, i) => (
                     <div key={f.id} className="rf-card p-6 relative group space-y-4">
                       <button type="button" onClick={() => rmProj(i)}
-                        className="absolute top-4 right-4 p-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+                        className="absolute top-4 right-4 p-2 text-muted-foreground/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -364,22 +364,22 @@ export default function ProfilePage() {
               {tab === "awards" && (
                 <motion.div key="awards" {...slide} className="space-y-4">
                   <div className="flex items-center justify-between px-1">
-                    <h3 className="text-sm font-bold text-zinc-400 uppercase tracking-widest">Awards & Achievements</h3>
+                    <h3 className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Awards & Achievements</h3>
                     <Button type="button" size="sm" variant="outline"
                       onClick={() => addAwd({ title: "", description: "" })}>
                       <Plus className="h-3.5 w-3.5 mr-1" />Add
                     </Button>
                   </div>
                   {awdF.length === 0 && (
-                    <div className="rf-card p-12 text-center border-dashed border-zinc-800">
-                      <Trophy className="h-10 w-10 text-zinc-700 mx-auto mb-3" />
-                      <p className="text-sm text-zinc-500">No awards added yet.</p>
+                    <div className="rf-card p-12 text-center border-dashed border-border">
+                      <Trophy className="h-10 w-10 text-muted-foreground/50 mx-auto mb-3" />
+                      <p className="text-sm text-muted-foreground">No awards added yet.</p>
                     </div>
                   )}
                   {awdF.map((f, i) => (
                     <div key={f.id} className="rf-card p-6 relative group space-y-4">
                       <button type="button" onClick={() => rmAwd(i)}
-                        className="absolute top-4 right-4 p-2 text-zinc-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+                        className="absolute top-4 right-4 p-2 text-muted-foreground/60 hover:text-destructive opacity-0 group-hover:opacity-100 transition-all">
                         <Trash2 className="h-4 w-4" />
                       </button>
                       <Input label="Award Title" {...register(`awards.${i}.title`)} />

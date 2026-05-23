@@ -81,10 +81,10 @@ export default function SettingsPage() {
         <div className="lg:col-span-3 space-y-6">
           {/* Security */}
           <motion.section id="security" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} className="rf-card p-6">
-            <h3 className="text-base font-semibold text-zinc-200 mb-5 flex items-center gap-2">
-              <Shield className="h-4 w-4 text-primary-400" />Security
+            <h3 className="text-base font-semibold text-foreground mb-5 flex items-center gap-2">
+              <Shield className="h-4 w-4 text-primary" />Security
             </h3>
-            <div className="mb-4 p-3 rounded-xl bg-zinc-800/50 text-xs text-zinc-500">
+            <div className="mb-4 p-3 rounded-xl bg-secondary/50 text-xs text-muted-foreground">
               Manage your password and authentication settings. These are handled securely by our Auth Microservice.
             </div>
             <form onSubmit={passwordForm.handleSubmit((d) => passwordMutation.mutate(d))} className="space-y-4">
@@ -108,8 +108,8 @@ export default function SettingsPage() {
           {me?.role !== "premium" && (
             <motion.section initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}
               className="rf-card p-6 border-primary-500/20 bg-primary-500/5">
-              <h3 className="text-base font-semibold text-zinc-200 mb-2">Upgrade to Premium</h3>
-              <p className="text-sm text-zinc-500 mb-4">
+              <h3 className="text-base font-semibold text-foreground mb-2">Upgrade to Premium</h3>
+              <p className="text-sm text-muted-foreground mb-4">
                 Unlock unlimited AI optimisations, priority processing, and advanced interview modes.
               </p>
               <Button variant="gradient">Upgrade Now — $9/mo</Button>

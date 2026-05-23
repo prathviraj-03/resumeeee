@@ -36,13 +36,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="dark" suppressHydrationWarning>
-      <body className={`${inter.variable} font-sans bg-surface text-zinc-50 antialiased`}>
+    <html lang="en" suppressHydrationWarning>
+      <body className={`${inter.variable} font-sans antialiased`}>
         <Providers>
           {children}
           <Toaster
             position="bottom-right"
-            theme="dark"
             richColors
             expand={false}
             duration={4000}

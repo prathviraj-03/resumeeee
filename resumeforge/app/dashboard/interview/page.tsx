@@ -31,14 +31,14 @@ const schema = z.object({
 type ConfigForm = z.infer<typeof schema>;
 
 const TYPE_CONFIG = {
-  technical: { icon: Code2,    label: "Technical",  desc: "Algorithms, system design" },
-  behavioral:{ icon: Users,    label: "Behavioral", desc: "STAR method, soft skills" },
-  hr:        { icon: Briefcase,label: "HR",          desc: "Culture fit, career goals" },
+  technical: { icon: Code2, label: "Technical", desc: "Algorithms, system design" },
+  behavioral: { icon: Users, label: "Behavioral", desc: "STAR method, soft skills" },
+  hr: { icon: Briefcase, label: "HR", desc: "Culture fit, career goals" },
 };
 const DIFF_COLOR = {
-  easy:   "text-success bg-success/10 border-success/30",
+  easy: "text-success bg-success/10 border-success/30",
   medium: "text-warning bg-warning/10 border-warning/30",
-  hard:   "text-danger  bg-danger/10  border-danger/30",
+  hard: "text-danger  bg-danger/10  border-danger/30",
 };
 
 // Normalise session summary from backend
@@ -57,9 +57,9 @@ function EmptyState({ onStart }: { onStart: () => void }) {
   return (
     <div className="empty-state">
       <svg className="w-24 h-24 mb-6 opacity-30" viewBox="0 0 96 96" fill="none">
-        <circle cx="48" cy="48" r="32" stroke="#6366f1" strokeWidth="2" fill="none"/>
-        <circle cx="48" cy="48" r="14" stroke="#6366f1" strokeWidth="2" fill="#1C1C1F"/>
-        <path d="M48 34v28M34 48h28" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" opacity="0.3"/>
+        <circle cx="48" cy="48" r="32" stroke="#6366f1" strokeWidth="2" fill="none" />
+        <circle cx="48" cy="48" r="14" stroke="#6366f1" strokeWidth="2" fill="#1C1C1F" />
+        <path d="M48 34v28M34 48h28" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
       </svg>
       <h3 className="text-lg font-semibold text-zinc-300 mb-2">No interviews yet</h3>
       <p className="text-sm text-zinc-600 mb-6 max-w-xs text-center">
@@ -88,7 +88,7 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
           <DialogDescription>Questions are pulled from the backend question bank, or dynamically generated if a Job Description is provided.</DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit(onStart)} className="grid md:grid-cols-2 gap-6 py-2">
-          
+
           {/* Left Column: Basic Settings */}
           <div className="space-y-5">
             {/* Type */}
@@ -99,7 +99,7 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
                   <button type="button" key={type} onClick={() => setValue("type", type)}
                     className={cn("p-3 rounded-xl border text-center transition-all",
                       t === type ? "border-primary-500 bg-primary-500/10 text-primary-400"
-                                 : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
+                        : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
                     <cfg.icon className="h-4 w-4 mx-auto mb-1.5" />
                     <div className="text-xs font-medium">{cfg.label}</div>
                   </button>
@@ -110,7 +110,7 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">Difficulty</label>
               <div className="flex gap-2">
-                {(["easy","medium","hard"] as InterviewDifficulty[]).map((diff) => (
+                {(["easy", "medium", "hard"] as InterviewDifficulty[]).map((diff) => (
                   <button type="button" key={diff} onClick={() => setValue("difficulty", diff)}
                     className={cn("flex-1 py-2 rounded-xl border text-xs font-medium transition-all",
                       d === diff ? DIFF_COLOR[diff] : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
@@ -123,11 +123,11 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
             <div>
               <label className="block text-sm font-medium text-zinc-300 mb-2">Questions</label>
               <div className="flex gap-2">
-                {[5,10,15].map((num) => (
-                  <button type="button" key={num} onClick={() => setValue("questionCount", num as 5|10|15)}
+                {[5, 10, 15].map((num) => (
+                  <button type="button" key={num} onClick={() => setValue("questionCount", num as 5 | 10 | 15)}
                     className={cn("flex-1 py-2 rounded-xl border text-sm font-medium transition-all",
                       n === num ? "border-primary-500 bg-primary-500/10 text-primary-400"
-                                : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
+                        : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
                     {num}
                   </button>
                 ))}
@@ -144,8 +144,8 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
                 <p className="text-xs text-zinc-400 mt-1">Paste a job description and we&apos;ll generate custom questions matching its requirements.</p>
               </div>
             </div>
-            <Textarea 
-              label="Job Description (Optional)" 
+            <Textarea
+              label="Job Description (Optional)"
               placeholder="Paste the job description..."
               className="flex-1 min-h-[160px] text-sm"
               error={errors.jobDescription?.message}
@@ -245,7 +245,7 @@ export default function InterviewPage() {
 
       {isLoading ? (
         <div className="rf-card divide-y divide-surface-border">
-          {[1,2,3].map((i) => (
+          {[1, 2, 3].map((i) => (
             <div key={i} className="p-5 flex items-center gap-4">
               <Skeleton className="h-10 w-10 rounded-xl" />
               <div className="flex-1 space-y-2"><Skeleton className="h-4 w-40" /><Skeleton className="h-3 w-24" /></div>
@@ -264,23 +264,23 @@ export default function InterviewPage() {
             const scoreColor = score >= 8 ? "text-success" : score >= 6 ? "text-warning" : "text-danger";
             return (
               <motion.div key={s.id} initial={{ opacity: 0, x: -8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: i * 0.05 }}
-                className="p-5 flex items-center gap-4 hover:bg-zinc-800/30 transition-colors cursor-pointer group"
+                className="p-5 flex items-center gap-4 hover:bg-secondary/30 transition-colors cursor-pointer group"
                 onClick={() => router.push(`/dashboard/interview/${s.id}`)}
                 role="button" tabIndex={0}
                 onKeyDown={(e) => e.key === "Enter" && router.push(`/dashboard/interview/${s.id}`)}>
-                <div className="h-10 w-10 rounded-xl bg-zinc-800 flex items-center justify-center shrink-0">
-                  <TypeIcon className="h-5 w-5 text-zinc-400" />
+                <div className="h-10 w-10 rounded-xl bg-secondary flex items-center justify-center shrink-0">
+                  <TypeIcon className="h-5 w-5 text-muted-foreground" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
-                    <span className="text-sm font-medium text-zinc-200">
+                    <span className="text-sm font-medium text-foreground">
                       {TYPE_CONFIG[typeKey]?.label ?? s.role ?? "Interview"}
                     </span>
                     <span className={cn("text-xs px-1.5 py-0.5 rounded-full border", DIFF_COLOR[s.difficulty] ?? "")}>
                       {DIFFICULTY_LABELS[s.difficulty]}
                     </span>
                   </div>
-                  <div className="flex items-center gap-3 text-xs text-zinc-600">
+                  <div className="flex items-center gap-3 text-xs text-muted-foreground">
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" />{s.startedAt ? formatDate(s.startedAt) : "—"}</span>
                     {s.questionCount && <span>{s.questionCount} questions</span>}
                   </div>
@@ -291,16 +291,16 @@ export default function InterviewPage() {
                   </Badge>
                   {s.status === "completed" && (
                     <div className="flex items-center gap-1">
-                      <Star className="h-3.5 w-3.5 text-zinc-600" />
+                      <Star className="h-3.5 w-3.5 text-muted-foreground" />
                       <span className={cn("text-sm font-bold font-mono", scoreColor)}>{score.toFixed(1)}</span>
-                      <span className="text-xs text-zinc-600">/10</span>
+                      <span className="text-xs text-muted-foreground">/10</span>
                     </div>
                   )}
                   <div className="flex items-center gap-2">
-                    <ChevronRight className="h-4 w-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" />
-                    <button 
+                    <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-muted-foreground/80 transition-colors" />
+                    <button
                       onClick={(e) => handleDelete(e, s.id)}
-                      className="p-2 hover:bg-danger/10 text-zinc-600 hover:text-danger transition-colors rounded-lg"
+                      className="p-2 hover:bg-danger/10 text-muted-foreground hover:text-danger transition-colors rounded-lg"
                       title="Delete interview"
                     >
                       <Trash2 className="h-4 w-4" />
@@ -317,8 +317,8 @@ export default function InterviewPage() {
         onStart={(cfg) => { setConfigOpen(false); startMutation.mutate({ ...cfg, profileData: profile }); }}
         isPending={startMutation.isPending} />
 
-      <DeleteConfirmationModal 
-        open={!!deleteTarget} 
+      <DeleteConfirmationModal
+        open={!!deleteTarget}
         onClose={() => setDeleteTarget(null)}
         onConfirm={() => deleteTarget && deleteMutation.mutate(deleteTarget)}
         isPending={deleteMutation.isPending}

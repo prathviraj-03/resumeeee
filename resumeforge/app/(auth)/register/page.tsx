@@ -58,19 +58,19 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface flex">
+    <div className="min-h-screen bg-background flex">
       {/* Features panel */}
-      <div className="hidden lg:flex lg:w-[45%] bg-surface-card border-r border-surface-border flex-col justify-center p-12 relative overflow-hidden">
+      <div className="hidden lg:flex lg:w-[45%] bg-card border-r border-border flex-col justify-center p-12 relative overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-b from-primary-500/5 via-transparent to-transparent pointer-events-none" />
         <div className="relative">
           <div className="flex items-center gap-2.5 mb-10">
             <div className="h-9 w-9 rounded-xl bg-primary-gradient flex items-center justify-center shadow-glow">
               <Zap className="h-5 w-5 text-white" />
             </div>
-            <span className="text-xl font-bold text-zinc-100 tracking-tight">ResumeForge</span>
+            <span className="text-xl font-bold text-foreground tracking-tight">ResumeForge</span>
           </div>
-          <h2 className="text-3xl font-bold text-zinc-100 mb-3 leading-tight">Land your dream job with AI</h2>
-          <p className="text-zinc-500 text-sm mb-10 leading-relaxed">
+          <h2 className="text-3xl font-bold text-foreground mb-3 leading-tight">Land your dream job with AI</h2>
+          <p className="text-muted-foreground text-sm mb-10 leading-relaxed">
             ResumeForge uses a microservices AI backend — Auth, AI, Interview, Profile and Skill Gap — all under one gateway.
           </p>
           <ul className="space-y-4">
@@ -79,7 +79,7 @@ export default function RegisterPage() {
                 <div className="h-6 w-6 rounded-full bg-success/10 flex items-center justify-center shrink-0">
                   <CheckCircle2 className="h-3.5 w-3.5 text-success" />
                 </div>
-                <span className="text-sm text-zinc-300">{f}</span>
+                <span className="text-sm text-foreground/80">{f}</span>
               </li>
             ))}
           </ul>
@@ -90,8 +90,8 @@ export default function RegisterPage() {
       <div className="flex-1 flex items-center justify-center p-8">
         <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}
           className="w-full max-w-md">
-          <h1 className="text-2xl font-bold text-zinc-100 mb-1">Create your account</h1>
-          <p className="text-sm text-zinc-500 mb-8">Free forever. No credit card required.</p>
+          <h1 className="text-2xl font-bold text-foreground mb-1">Create your account</h1>
+          <p className="text-sm text-muted-foreground mb-8">Free forever. No credit card required.</p>
 
           <div className="rf-card p-8">
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-5" noValidate>
@@ -112,16 +112,16 @@ export default function RegisterPage() {
                 Create Account<ArrowRight className="h-4 w-4" />
               </Button>
             </form>
-            <p className="mt-4 text-xs text-zinc-600 text-center">
+            <p className="mt-4 text-[10px] text-muted-foreground/60 text-center">
               By registering you agree to our{" "}
-              <Link href="/terms" className="text-zinc-500 hover:text-zinc-300 underline">Terms</Link> and{" "}
-              <Link href="/privacy" className="text-zinc-500 hover:text-zinc-300 underline">Privacy Policy</Link>.
+              <Link href="/terms" className="text-muted-foreground hover:text-primary underline">Terms</Link> and{" "}
+              <Link href="/privacy" className="text-muted-foreground hover:text-primary underline">Privacy Policy</Link>.
             </p>
           </div>
 
           <div className="mt-6 text-center">
-            <span className="text-sm text-zinc-500">Already have an account? </span>
-            <Link href="/login" className="text-sm text-primary-400 hover:text-primary-300 font-medium transition-colors">
+            <span className="text-sm text-muted-foreground">Already have an account? </span>
+            <Link href="/login" className="text-sm text-primary hover:text-primary/80 font-medium transition-colors">
               Sign in
             </Link>
           </div>

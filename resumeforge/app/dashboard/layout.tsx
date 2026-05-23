@@ -27,7 +27,7 @@ import { useTheme } from "next-themes";
 import { useAuthStore } from "@/store/auth.store";
 import { useUIStore } from "@/store/ui.store";
 import { logout } from "@/lib/api/auth";
-import { cn, getInitials } from "@/lib/utils";
+import { cn, getInitials, getDisplayName } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -111,13 +111,13 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
         <div className="h-8 w-8 rounded-xl bg-primary-gradient flex items-center justify-center shadow-glow-sm">
           <Zap className="h-4 w-4 text-white" />
         </div>
-        <span className="text-lg font-bold text-zinc-100 tracking-tight">
+        <span className="text-lg font-bold text-foreground tracking-tight">
           ResumeForge
         </span>
         {onClose && (
           <button
             onClick={onClose}
-            className="ml-auto p-1.5 text-zinc-500 hover:text-zinc-100 rounded-lg hover:bg-zinc-800 transition-colors lg:hidden"
+            className="ml-auto p-1.5 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary transition-colors lg:hidden"
           >
             <X className="h-4 w-4" />
           </button>
@@ -162,8 +162,8 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
             {user ? getInitials(user.fullName) : "U"}
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-zinc-200 truncate">
-              {user?.fullName || "User"}
+            <p className="text-sm font-medium text-foreground truncate">
+              {getDisplayName(user)}
             </p>
             <div className="flex items-center gap-1.5 mt-0.5">
               <Badge
@@ -176,7 +176,7 @@ function Sidebar({ onClose }: { onClose?: () => void }) {
           </div>
           <button
             onClick={handleLogout}
-            className="p-1.5 text-zinc-600 hover:text-danger rounded-lg hover:bg-danger/10 transition-all"
+            className="p-1.5 text-muted-foreground hover:text-danger rounded-lg hover:bg-danger/10 transition-all"
             aria-label="Logout"
           >
             <LogOut className="h-4 w-4" />
@@ -205,28 +205,28 @@ function TopBar({ pageTitle }: { pageTitle: string }) {
     <header className="topbar">
       <button
         onClick={toggleSidebar}
-        className="mr-4 p-2 text-zinc-500 hover:text-zinc-100 rounded-lg hover:bg-zinc-800 transition-colors lg:hidden"
+        className="mr-4 p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary transition-colors lg:hidden"
         aria-label="Toggle sidebar"
       >
         <Menu className="h-5 w-5" />
       </button>
 
-      <h1 className="text-base font-semibold text-zinc-100 flex-1">{pageTitle}</h1>
+      <h1 className="text-base font-semibold text-foreground flex-1">{pageTitle}</h1>
 
       <div className="flex items-center gap-2">
         {/* Notifications */}
         <button
-          className="relative p-2 text-zinc-500 hover:text-zinc-100 rounded-lg hover:bg-zinc-800 transition-colors"
+          className="relative p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary transition-colors"
           aria-label="Notifications"
         >
           <Bell className="h-4 w-4" />
-          <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary-500" />
+          <span className="absolute top-1.5 right-1.5 h-1.5 w-1.5 rounded-full bg-primary" />
         </button>
 
         {/* Theme toggle */}
         <button
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          className="p-2 text-zinc-500 hover:text-zinc-100 rounded-lg hover:bg-zinc-800 transition-colors"
+          className="p-2 text-muted-foreground hover:text-foreground rounded-lg hover:bg-secondary transition-colors"
           aria-label="Toggle theme"
         >
           {theme === "dark" ? (
@@ -239,21 +239,21 @@ function TopBar({ pageTitle }: { pageTitle: string }) {
         {/* User dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-zinc-800 transition-colors">
-              <div className="h-7 w-7 rounded-full bg-primary-500/20 flex items-center justify-center text-xs font-semibold text-primary-400">
+            <button className="flex items-center gap-2 pl-2 pr-3 py-1.5 rounded-xl hover:bg-secondary transition-colors">
+              <div className="h-7 w-7 rounded-full bg-primary/20 flex items-center justify-center text-xs font-semibold text-primary">
                 {user ? getInitials(user.fullName) : "U"}
               </div>
-              <span className="text-sm text-zinc-300 hidden sm:block">
-                {user?.fullName?.split(" ")[0] || "User"}
+              <span className="text-sm text-foreground/80 hidden sm:block">
+                {getDisplayName(user).split(" ")[0]}
               </span>
-              <ChevronDown className="h-3.5 w-3.5 text-zinc-500" />
+              <ChevronDown className="h-3.5 w-3.5 text-muted-foreground" />
             </button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-56">
             <DropdownMenuLabel className="font-normal">
               <div className="flex flex-col space-y-1">
-                <p className="text-sm font-medium text-zinc-100">{user?.fullName}</p>
-                <p className="text-xs text-zinc-500 truncate">{user?.email}</p>
+                <p className="text-sm font-medium text-foreground">{getDisplayName(user)}</p>
+                <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
