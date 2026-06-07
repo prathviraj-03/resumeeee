@@ -74,7 +74,7 @@ export default function ProfileSetupWizard() {
   const [skillInput, setSkillInput] = useState("");
   const [certInput, setCertInput] = useState("");
 
-  const { register, handleSubmit, control, watch, setValue, formState: { errors } } = useForm<SetupForm>({
+  const { register, handleSubmit, control, watch, setValue, trigger, formState: { errors } } = useForm<SetupForm>({
     resolver: zodResolver(setupSchema),
     defaultValues: {
       full_name: user?.fullName || "",
@@ -108,8 +108,27 @@ export default function ProfileSetupWizard() {
     }
   };
 
-  const nextStep = () => setStep(s => Math.min(s + 1, STEPS.length));
+  const nextStep = async () => {
+    let fieldsToValidate: any[] = [];
+    switch (step) {
+      case 1: fieldsToValidate = ["full_name", "email", "phone_number", "location", "target_role", "years_experience"]; break;
+      case 2: fieldsToValidate = ["summary"]; break;
+      case 3: fieldsToValidate = ["experience"]; break;
+      case 4: fieldsToValidate = ["education", "certifications"]; break;
+    }
+    
+    const isValid = await trigger(fieldsToValidate);
+    if (isValid) {
+      setStep(s => Math.min(s + 1, STEPS.length));
+    } else {
+      toast.error("Please fill out all required fields correctly before proceeding.");
+    }
+  };
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
+
+  const onInvalid = () => {
+    toast.error("Please fix the errors on this page before submitting.");
+  };
 
   const onSubmit = async (data: SetupForm) => {
     setIsSubmitting(true);
@@ -129,19 +148,19 @@ export default function ProfileSetupWizard() {
     <div className="max-w-4xl mx-auto py-8">
       {/* Progress Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-zinc-100 mb-2">Complete Your Master Profile</h1>
-        <p className="text-zinc-500 text-sm mb-6">This information allows our AI to generate targeted resumes and interviews for you.</p>
+        <h1 className="text-2xl font-bold text-foreground mb-2">Complete Your Master Profile</h1>
+        <p className="text-muted-foreground text-sm mb-6">This information allows our AI to generate targeted resumes and interviews for you.</p>
         
         <div className="flex items-center justify-between relative">
-          <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-zinc-800 -z-10" />
+          <div className="absolute left-0 right-0 top-1/2 h-0.5 bg-secondary -z-10" />
           <div className="absolute left-0 top-1/2 h-0.5 bg-primary-500 transition-all duration-300 -z-10" style={{ width: `${((step - 1) / (STEPS.length - 1)) * 100}%` }} />
           
           {STEPS.map((s) => (
             <div key={s.id} className="flex flex-col items-center gap-2">
-              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step >= s.id ? "bg-primary-500 text-white shadow-glow-sm" : "bg-zinc-800 text-zinc-500 border border-zinc-700"}`}>
+              <div className={`h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${step >= s.id ? "bg-primary-500 text-white shadow-glow-sm" : "bg-secondary text-muted-foreground border border-border"}`}>
                 {s.id}
               </div>
-              <span className={`text-[10px] uppercase tracking-wider hidden sm:block ${step >= s.id ? "text-zinc-300 font-medium" : "text-zinc-600"}`}>
+              <span className={`text-[10px] uppercase tracking-wider hidden sm:block ${step >= s.id ? "text-foreground/80 font-medium" : "text-muted-foreground/70"}`}>
                 {s.title}
               </span>
             </div>
@@ -151,11 +170,11 @@ export default function ProfileSetupWizard() {
 
       {/* Form Content */}
       <div className="rf-card p-6 md:p-10 min-h-[400px]">
-        <form id="setup-form" onSubmit={handleSubmit(onSubmit)}>
+        <form id="setup-form" onSubmit={handleSubmit(onSubmit, onInvalid)}>
           <AnimatePresence mode="wait">
             {step === 1 && (
               <motion.div key="step1" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-xl font-semibold text-zinc-100 flex items-center gap-2"><User className="h-5 w-5 text-primary-400" /> Personal Information</h2>
+                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2"><User className="h-5 w-5 text-primary-400" /> Personal Information</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <Input label="Full Name *" {...register("full_name")} error={errors.full_name?.message} leftIcon={<User className="h-4 w-4" />} />
                   <Input label="Email *" {...register("email")} error={errors.email?.message} disabled leftIcon={<Mail className="h-4 w-4" />} />
@@ -169,8 +188,8 @@ export default function ProfileSetupWizard() {
 
             {step === 2 && (
               <motion.div key="step2" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
-                <h2 className="text-xl font-semibold text-zinc-100 flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary-400" /> Professional Summary</h2>
-                <p className="text-sm text-zinc-500">Provide a strong overview of your career. Our AI will use this as a base to tailor your resume for specific jobs.</p>
+                <h2 className="text-xl font-semibold text-foreground flex items-center gap-2"><Sparkles className="h-5 w-5 text-primary-400" /> Professional Summary</h2>
+                <p className="text-sm text-muted-foreground">Provide a strong overview of your career. Our AI will use this as a base to tailor your resume for specific jobs.</p>
                 <Textarea label="Summary *" placeholder="I am a software engineer with..." {...register("summary")} error={errors.summary?.message} className="h-48" />
               </motion.div>
             )}
@@ -178,18 +197,18 @@ export default function ProfileSetupWizard() {
             {step === 3 && (
               <motion.div key="step3" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-zinc-100 flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary-400" /> Work Experience</h2>
+                  <h2 className="text-xl font-semibold text-foreground flex items-center gap-2"><Briefcase className="h-5 w-5 text-primary-400" /> Work Experience</h2>
                   <Button type="button" size="sm" variant="outline" onClick={() => appendExp({ title: "", company: "", duration: "", description: "" })}>
                     <Plus className="h-3 w-3 mr-1" /> Add Job
                   </Button>
                 </div>
                 {expFields.length === 0 ? (
-                  <p className="text-sm text-zinc-500 italic">No experience added. Click &apos;Add Job&apos; if you have work history.</p>
+                  <p className="text-sm text-muted-foreground italic">No experience added. Click &apos;Add Job&apos; if you have work history.</p>
                 ) : (
                   <div className="space-y-6">
                     {expFields.map((field, index) => (
-                      <div key={field.id} className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-800 relative group">
-                        <button type="button" onClick={() => removeExp(index)} className="absolute top-4 right-4 p-1.5 text-zinc-500 hover:text-danger rounded-lg transition-colors"><Trash2 className="h-4 w-4" /></button>
+                      <div key={field.id} className="p-4 bg-secondary/50 rounded-xl border border-border relative group">
+                        <button type="button" onClick={() => removeExp(index)} className="absolute top-4 right-4 p-1.5 text-muted-foreground hover:text-danger rounded-lg transition-colors"><Trash2 className="h-4 w-4" /></button>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <Input label="Job Title" {...register(`experience.${index}.title`)} error={errors.experience?.[index]?.title?.message} />
                           <Input label="Company" {...register(`experience.${index}.company`)} error={errors.experience?.[index]?.company?.message} />
@@ -208,33 +227,33 @@ export default function ProfileSetupWizard() {
             {step === 4 && (
               <motion.div key="step4" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-6">
                 <div className="flex items-center justify-between">
-                  <h2 className="text-xl font-semibold text-zinc-100 flex items-center gap-2"><GraduationCap className="h-5 w-5 text-primary-400" /> Education & Certs</h2>
+                  <h2 className="text-xl font-semibold text-foreground flex items-center gap-2"><GraduationCap className="h-5 w-5 text-primary-400" /> Education & Certs</h2>
                   <Button type="button" size="sm" variant="outline" onClick={() => appendEdu({ degree: "", institution: "", year: "" })}>
                     <Plus className="h-3 w-3 mr-1" /> Add Education
                   </Button>
                 </div>
                 <div className="space-y-4 mb-8">
                   {eduFields.map((field, index) => (
-                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-zinc-900/50 rounded-xl border border-zinc-800 relative">
+                    <div key={field.id} className="grid grid-cols-1 md:grid-cols-12 gap-4 p-4 bg-secondary/50 rounded-xl border border-border relative">
                       <div className="md:col-span-5"><Input label="Degree / Major" {...register(`education.${index}.degree`)} error={errors.education?.[index]?.degree?.message} /></div>
                       <div className="md:col-span-5"><Input label="Institution" {...register(`education.${index}.institution`)} error={errors.education?.[index]?.institution?.message} /></div>
                       <div className="md:col-span-2 relative">
                         <Input label="Year" {...register(`education.${index}.year`)} />
-                        <button type="button" onClick={() => removeEdu(index)} className="absolute top-8 right-2 text-zinc-500 hover:text-danger"><Trash2 className="h-4 w-4" /></button>
+                        <button type="button" onClick={() => removeEdu(index)} className="absolute top-8 right-2 text-muted-foreground hover:text-danger"><Trash2 className="h-4 w-4" /></button>
                       </div>
                     </div>
                   ))}
                 </div>
 
-                <div className="pt-6 border-t border-zinc-800">
-                  <h3 className="text-sm font-semibold text-zinc-300 mb-3">Certifications</h3>
+                <div className="pt-6 border-t border-border">
+                  <h3 className="text-sm font-semibold text-foreground/80 mb-3">Certifications</h3>
                   <div className="flex gap-2 mb-4">
                     <Input placeholder="e.g. AWS Certified Solutions Architect" value={certInput} onChange={(e) => setCertInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addCert())} />
                     <Button type="button" variant="secondary" onClick={addCert}>Add</Button>
                   </div>
                   <div className="flex flex-wrap gap-2">
                     {currentCerts.map(cert => (
-                      <div key={cert} className="px-3 py-1.5 rounded-lg bg-zinc-800 text-sm text-zinc-300 flex items-center gap-2">
+                      <div key={cert} className="px-3 py-1.5 rounded-lg bg-secondary text-sm text-foreground/80 flex items-center gap-2">
                         {cert} <Trash2 className="h-3 w-3 cursor-pointer hover:text-danger" onClick={() => setValue("certifications", currentCerts.filter(c => c !== cert))} />
                       </div>
                     ))}
@@ -247,7 +266,7 @@ export default function ProfileSetupWizard() {
               <motion.div key="step5" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="space-y-8">
                 <div>
                   <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-xl font-semibold text-zinc-100 flex items-center gap-2"><Github className="h-5 w-5 text-primary-400" /> Key Projects *</h2>
+                    <h2 className="text-xl font-semibold text-foreground flex items-center gap-2"><Github className="h-5 w-5 text-primary-400" /> Key Projects *</h2>
                     <Button type="button" size="sm" variant="outline" onClick={() => appendProj({ name: "", description: "", url: "" })}>
                       <Plus className="h-3 w-3 mr-1" /> Add Project
                     </Button>
@@ -255,8 +274,8 @@ export default function ProfileSetupWizard() {
                   {errors.projects?.root && <p className="text-danger text-sm mb-4">{errors.projects.root.message}</p>}
                   <div className="space-y-4">
                     {projFields.map((field, index) => (
-                      <div key={field.id} className="p-4 bg-zinc-900/50 rounded-xl border border-zinc-800 relative">
-                        <button type="button" onClick={() => removeProj(index)} className="absolute top-4 right-4 text-zinc-500 hover:text-danger"><Trash2 className="h-4 w-4" /></button>
+                      <div key={field.id} className="p-4 bg-secondary/50 rounded-xl border border-border relative">
+                        <button type="button" onClick={() => removeProj(index)} className="absolute top-4 right-4 text-muted-foreground hover:text-danger"><Trash2 className="h-4 w-4" /></button>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                           <Input label="Project Name" {...register(`projects.${index}.name`)} error={errors.projects?.[index]?.name?.message} />
                           <Input label="Project URL (optional)" {...register(`projects.${index}.url`)} />
@@ -267,8 +286,8 @@ export default function ProfileSetupWizard() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-zinc-800">
-                  <h3 className="text-sm font-semibold text-zinc-300 mb-3">Skills *</h3>
+                <div className="pt-6 border-t border-border">
+                  <h3 className="text-sm font-semibold text-foreground/80 mb-3">Skills *</h3>
                   {errors.skills && <p className="text-danger text-sm mb-2">{errors.skills.message}</p>}
                   <div className="flex gap-2 mb-4">
                     <Input placeholder="e.g. React, Node.js, Leadership" value={skillInput} onChange={(e) => setSkillInput(e.target.value)} onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addSkill())} />
@@ -283,7 +302,7 @@ export default function ProfileSetupWizard() {
                   </div>
                 </div>
 
-                <div className="pt-6 border-t border-zinc-800 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="pt-6 border-t border-border grid grid-cols-1 md:grid-cols-2 gap-4">
                   <Input label="LinkedIn URL" {...register("linkedin_url")} leftIcon={<Linkedin className="h-4 w-4" />} />
                   <Input label="GitHub URL" {...register("github_url")} leftIcon={<Github className="h-4 w-4" />} />
                   <Input label="Portfolio URL" {...register("portfolio_url")} leftIcon={<Globe className="h-4 w-4" />} />

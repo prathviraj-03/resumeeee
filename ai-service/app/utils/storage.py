@@ -134,14 +134,17 @@ class CloudinaryStorage:
     def _build_raw_url(self, public_id: str) -> str:
         """
         Construct the direct Cloudinary URL for a raw upload.
-
-        Pattern: https://res.cloudinary.com/{cloud_name}/raw/upload/{public_id}
-
-        NOTE: For raw resources, the public_id already contains the file extension
-        (e.g. .pdf), so no suffix is appended.
+        Uses the cloudinary SDK to generate a signed URL to prevent 401 Unauthorized errors
+        on strict delivery accounts.
         """
-        cloud = settings.CLOUDINARY_CLOUD_NAME
-        return f"https://res.cloudinary.com/{cloud}/raw/upload/{public_id}"
+        import cloudinary.utils
+        url, _ = cloudinary.utils.cloudinary_url(
+            public_id,
+            resource_type="raw",
+            secure=True,
+            sign_url=True
+        )
+        return url
 
     def get_direct_url(self, public_id: str) -> str:
         """Return the direct Cloudinary URL (no signing needed for raw resources)."""

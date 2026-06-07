@@ -18,14 +18,14 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
       <div className="w-full">
         <div className="flex items-center justify-between mb-1.5">
           {label && (
-            <label htmlFor={inputId} className="block text-sm font-medium text-zinc-300">
+            <label htmlFor={inputId} className="block text-sm font-medium text-foreground/80">
               {label}
             </label>
           )}
           {showCount && (
             <span className={cn(
               "text-xs font-mono transition-colors",
-              maxLength && charCount > maxLength * 0.9 ? "text-warning" : "text-zinc-500"
+              maxLength && charCount > maxLength * 0.9 ? "text-warning" : "text-muted-foreground"
             )}>
               {charCount}{maxLength ? `/${maxLength}` : ""}
             </span>
@@ -34,8 +34,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         <textarea
           id={inputId}
           className={cn(
-            "flex w-full rounded-xl border bg-surface-card px-4 py-3 text-sm text-zinc-100",
-            "border-surface-border placeholder:text-zinc-600",
+            "flex w-full rounded-xl border bg-card px-4 py-3 text-sm text-foreground",
+            "border-border placeholder:text-muted-foreground/50",
             "focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 focus:outline-none",
             "disabled:cursor-not-allowed disabled:opacity-50",
             "transition-all duration-200 resize-none",
@@ -53,7 +53,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           </p>
         )}
         {hint && !error && (
-          <p className="mt-1.5 text-xs text-zinc-500">{hint}</p>
+          <p className="mt-1.5 text-xs text-muted-foreground">{hint}</p>
         )}
       </div>
     );

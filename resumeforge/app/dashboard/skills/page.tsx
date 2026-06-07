@@ -126,7 +126,7 @@ export default function SkillsPage() {
           <div className="flex items-start gap-4 p-4 rounded-xl bg-primary-500/5 border border-primary-500/10 mb-4">
             <div className="mt-1"><Target className="h-5 w-5 text-primary-400" /></div>
             <div>
-              <h3 className="text-sm font-semibold text-zinc-200">Target Role</h3>
+              <h3 className="text-sm font-semibold text-foreground">Target Role</h3>
               <p className="text-xs text-zinc-400 mt-1">
                 We&apos;ll analyze your Master Profile against this job description to find missing skills.
               </p>
@@ -155,12 +155,12 @@ export default function SkillsPage() {
         <div className="flex gap-2 mb-6 border-b border-surface-border pb-px">
           <button onClick={() => setActiveTab("analysis")} 
             className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors", 
-              activeTab === "analysis" ? "border-primary-500 text-primary-400" : "border-transparent text-zinc-500 hover:text-zinc-300")}>
+              activeTab === "analysis" ? "border-primary-500 text-primary-400" : "border-transparent text-muted-foreground hover:text-foreground/80")}>
             Gap Analysis
           </button>
           <button onClick={() => setActiveTab("roadmap")} disabled={!gapResult}
             className={cn("px-4 py-2 text-sm font-medium border-b-2 transition-colors", 
-              activeTab === "roadmap" ? "border-primary-500 text-primary-400" : "border-transparent text-zinc-500 hover:text-zinc-300 disabled:opacity-50")}>
+              activeTab === "roadmap" ? "border-primary-500 text-primary-400" : "border-transparent text-muted-foreground hover:text-foreground/80 disabled:opacity-50")}>
             Learning Roadmap
           </button>
         </div>
@@ -178,26 +178,26 @@ export default function SkillsPage() {
               <div key={s.label} className={cn("rf-card p-4 text-center", s.bg)}>
                 <s.icon className={cn("h-5 w-5 mx-auto mb-1", s.color)} />
                 <div className={cn("text-2xl font-bold font-mono", s.color)}>{s.count}</div>
-                <div className="text-xs text-zinc-500 mt-0.5">{s.label}</div>
+                <div className="text-xs text-muted-foreground mt-0.5">{s.label}</div>
               </div>
             ))}
           </div>
 
           <div className="rf-card p-6">
-            <h3 className="text-base font-semibold text-zinc-200 mb-4">Missing Skills (Priority Gaps)</h3>
+            <h3 className="text-base font-semibold text-foreground mb-4">Missing Skills (Priority Gaps)</h3>
             <div className="flex flex-wrap gap-2 mb-6">
               {missing.length > 0 ? missing.map(m => (
                 <div key={m} className="px-3 py-1.5 rounded-lg bg-danger/10 border border-danger/20 text-danger text-sm font-medium">
                   {m}
                 </div>
-              )) : <span className="text-sm text-zinc-500">No missing skills! You&apos;re a perfect match.</span>}
+              )) : <span className="text-sm text-muted-foreground">No missing skills! You&apos;re a perfect match.</span>}
             </div>
 
             {missing.length > 0 && (
-              <div className="flex items-center justify-between p-4 rounded-xl bg-zinc-800/50 border border-surface-border">
+              <div className="flex items-center justify-between p-4 rounded-xl bg-secondary/60 border border-surface-border">
                 <div>
-                  <h4 className="text-sm font-medium text-zinc-200">Bridge the Gap</h4>
-                  <p className="text-xs text-zinc-500 mt-1">Let AI generate a week-by-week learning roadmap with real courses and resources.</p>
+                  <h4 className="text-sm font-medium text-foreground">Bridge the Gap</h4>
+                  <p className="text-xs text-muted-foreground mt-1">Let AI generate a week-by-week learning roadmap with real courses and resources.</p>
                 </div>
                 <Button variant="gradient" onClick={() => roadmapMutation.mutate({ missingSkills: missing, jobDescription: jdValue })} loading={roadmapMutation.isPending}>
                   <Map className="h-4 w-4" /> Generate Roadmap
@@ -240,15 +240,15 @@ export default function SkillsPage() {
                     <h3 className="text-lg font-bold text-primary-400 mb-4">{week.focus_area}</h3>
                     <div className="space-y-4">
                       {week.items.map((item, idx) => (
-                        <div key={idx} className="p-4 rounded-xl bg-zinc-900/50 border border-surface-border flex items-start gap-3">
+                        <div key={idx} className="p-4 rounded-xl bg-secondary/50 border border-surface-border flex items-start gap-3">
                           <div className="mt-0.5"><BookOpen className="h-4 w-4 text-zinc-400" /></div>
                           <div className="flex-1 min-w-0">
                             <div className="flex items-center gap-2 mb-1">
-                              <span className="text-sm font-semibold text-zinc-200">{item.title}</span>
+                              <span className="text-sm font-semibold text-foreground">{item.title}</span>
                               {item.priority === "High" && <Badge variant="danger" className="text-[10px]">High Priority</Badge>}
                               <Badge variant="muted" className="text-[10px]">{item.skill}</Badge>
                             </div>
-                            <p className="text-xs text-zinc-500 mb-3 leading-relaxed">{item.description}</p>
+                            <p className="text-xs text-muted-foreground mb-3 leading-relaxed">{item.description}</p>
                             <a href={item.resource} target="_blank" rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-xs font-medium text-primary-400 hover:text-primary-300 bg-primary-500/10 hover:bg-primary-500/20 px-3 py-1.5 rounded-full transition-colors">
                               <ExternalLink className="h-3 w-3" /> View Resource
@@ -262,7 +262,7 @@ export default function SkillsPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-12 text-zinc-500 text-sm">
+            <div className="text-center py-12 text-muted-foreground text-sm">
               Failed to load roadmap. Please try generating it again.
             </div>
           )}
@@ -272,11 +272,11 @@ export default function SkillsPage() {
       {/* Empty State */}
       {!gapResult && !analyzeMutation.isPending && (
         <div className="empty-state py-16">
-          <div className="h-16 w-16 rounded-2xl bg-zinc-800 flex items-center justify-center mb-4">
-            <Map className="h-8 w-8 text-zinc-600" />
+          <div className="h-16 w-16 rounded-2xl bg-secondary flex items-center justify-center mb-4">
+            <Map className="h-8 w-8 text-muted-foreground/70" />
           </div>
           <h3 className="text-base font-semibold text-zinc-400 mb-2">No active roadmap</h3>
-          <p className="text-sm text-zinc-600 max-w-xs text-center">
+          <p className="text-sm text-muted-foreground/70 max-w-xs text-center">
             Paste a job description above to identify your skill gaps and generate a personalized learning plan.
           </p>
         </div>

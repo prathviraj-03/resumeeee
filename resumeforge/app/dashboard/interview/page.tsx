@@ -46,7 +46,7 @@ function normSummary(s: InterviewSummary) {
   return {
     ...s,
     type: (s.type ?? s.role) as InterviewType | undefined,
-    overallScore: s.overallScore ?? s.overall_score,
+    overallScore: (s.overallScore ?? s.overall_score ?? 0) / 10,
     questionCount: s.questionCount ?? s.question_count,
     startedAt: s.startedAt ?? s.started_at ?? "",
     completedAt: s.completedAt ?? s.completed_at,
@@ -61,8 +61,8 @@ function EmptyState({ onStart }: { onStart: () => void }) {
         <circle cx="48" cy="48" r="14" stroke="#6366f1" strokeWidth="2" fill="#1C1C1F" />
         <path d="M48 34v28M34 48h28" stroke="#6366f1" strokeWidth="2" strokeLinecap="round" opacity="0.3" />
       </svg>
-      <h3 className="text-lg font-semibold text-zinc-300 mb-2">No interviews yet</h3>
-      <p className="text-sm text-zinc-600 mb-6 max-w-xs text-center">
+      <h3 className="text-lg font-semibold text-foreground/80 mb-2">No interviews yet</h3>
+      <p className="text-sm text-muted-foreground/70 mb-6 max-w-xs text-center">
         Start a mock interview — questions are fetched from the curated question bank based on role and difficulty.
       </p>
       <Button onClick={onStart} variant="gradient"><Plus className="h-4 w-4" />Start First Interview</Button>
@@ -93,13 +93,13 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
           <div className="space-y-5">
             {/* Type */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Interview Type</label>
+              <label className="block text-sm font-medium text-foreground/80 mb-2">Interview Type</label>
               <div className="grid grid-cols-3 gap-2">
                 {(Object.entries(TYPE_CONFIG) as [InterviewType, typeof TYPE_CONFIG[InterviewType]][]).map(([type, cfg]) => (
                   <button type="button" key={type} onClick={() => setValue("type", type)}
                     className={cn("p-3 rounded-xl border text-center transition-all",
                       t === type ? "border-primary-500 bg-primary-500/10 text-primary-400"
-                        : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
+                        : "border-surface-border text-muted-foreground hover:text-foreground/80")}>
                     <cfg.icon className="h-4 w-4 mx-auto mb-1.5" />
                     <div className="text-xs font-medium">{cfg.label}</div>
                   </button>
@@ -108,12 +108,12 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
             </div>
             {/* Difficulty */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Difficulty</label>
+              <label className="block text-sm font-medium text-foreground/80 mb-2">Difficulty</label>
               <div className="flex gap-2">
                 {(["easy", "medium", "hard"] as InterviewDifficulty[]).map((diff) => (
                   <button type="button" key={diff} onClick={() => setValue("difficulty", diff)}
                     className={cn("flex-1 py-2 rounded-xl border text-xs font-medium transition-all",
-                      d === diff ? DIFF_COLOR[diff] : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
+                      d === diff ? DIFF_COLOR[diff] : "border-surface-border text-muted-foreground hover:text-foreground/80")}>
                     {DIFFICULTY_LABELS[diff]}
                   </button>
                 ))}
@@ -121,13 +121,13 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
             </div>
             {/* Count */}
             <div>
-              <label className="block text-sm font-medium text-zinc-300 mb-2">Questions</label>
+              <label className="block text-sm font-medium text-foreground/80 mb-2">Questions</label>
               <div className="flex gap-2">
                 {[5, 10, 15].map((num) => (
                   <button type="button" key={num} onClick={() => setValue("questionCount", num as 5 | 10 | 15)}
                     className={cn("flex-1 py-2 rounded-xl border text-sm font-medium transition-all",
                       n === num ? "border-primary-500 bg-primary-500/10 text-primary-400"
-                        : "border-surface-border text-zinc-500 hover:text-zinc-300")}>
+                        : "border-surface-border text-muted-foreground hover:text-foreground/80")}>
                     {num}
                   </button>
                 ))}
@@ -140,7 +140,7 @@ function ConfigModal({ open, onClose, onStart, isPending }: {
             <div className="flex items-start gap-3 p-3 rounded-lg border border-primary-500/20 bg-primary-500/5">
               <div className="mt-0.5"><Target className="h-4 w-4 text-primary-400" /></div>
               <div>
-                <h4 className="text-sm font-semibold text-zinc-100">Tailor to a Role</h4>
+                <h4 className="text-sm font-semibold text-foreground">Tailor to a Role</h4>
                 <p className="text-xs text-zinc-400 mt-1">Paste a job description and we&apos;ll generate custom questions matching its requirements.</p>
               </div>
             </div>

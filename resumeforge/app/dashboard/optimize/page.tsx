@@ -58,13 +58,13 @@ function StepList({ isPending }: { isPending: boolean }) {
         return (
           <div key={step.label} className="flex items-center gap-3">
             <div className={cn("h-6 w-6 rounded-full flex items-center justify-center shrink-0 transition-all",
-              done ? "bg-success/10" : active ? "bg-primary-500/10" : "bg-zinc-800")}>
+              done ? "bg-success/10" : active ? "bg-primary-500/10" : "bg-secondary")}>
               {done   ? <CheckCircle2 className="h-3.5 w-3.5 text-success" /> :
                active ? <Loader2 className="h-3.5 w-3.5 text-primary-400 animate-spin" /> :
-                        <Circle className="h-3.5 w-3.5 text-zinc-600" />}
+                        <Circle className="h-3.5 w-3.5 text-muted-foreground/70" />}
             </div>
             <span className={cn("text-sm transition-colors",
-              done ? "text-success" : active ? "text-zinc-200" : "text-zinc-600")}>
+              done ? "text-success" : active ? "text-foreground" : "text-muted-foreground/70")}>
               {step.label}
             </span>
           </div>
@@ -124,14 +124,14 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
       {((result.originalScore ?? 0) > 0 || (result.optimizedScore ?? 0) > 0) && (
         <div className="rf-card p-4 flex items-center justify-between flex-wrap gap-3">
           <div>
-            <p className="text-sm font-semibold text-zinc-200">Optimization Complete</p>
-            <p className="text-xs text-zinc-500 mt-0.5">
+            <p className="text-sm font-semibold text-foreground">Optimization Complete</p>
+            <p className="text-xs text-muted-foreground mt-0.5">
               Review and edit the content below, then download with your preferred template
             </p>
           </div>
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-success/10 border border-success/20">
-            <span className="text-sm text-zinc-500 font-mono">{result.originalScore}</span>
-            <ArrowRight className="h-3.5 w-3.5 text-zinc-600" />
+            <span className="text-sm text-muted-foreground font-mono">{result.originalScore}</span>
+            <ArrowRight className="h-3.5 w-3.5 text-muted-foreground/70" />
             <span className="text-sm font-bold font-mono text-success">{result.optimizedScore}</span>
             <TrendingUp className="h-3.5 w-3.5 text-success" />
           </div>
@@ -144,7 +144,7 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
           <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">AI Suggestions</p>
           <ul className="space-y-1">
             {result.optimized_data!.suggestions.map((s, i) => (
-              <li key={i} className="text-xs text-zinc-500 flex items-start gap-1.5">
+              <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
                 <span className="text-primary-400 mt-0.5">•</span>{s}
               </li>
             ))}
@@ -156,14 +156,14 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
       <div className="rf-card p-5 space-y-3">
         <div className="flex items-center gap-2">
           <Edit3 className="h-4 w-4 text-primary-400" />
-          <h3 className="text-sm font-semibold text-zinc-200">Professional Summary</h3>
-          <span className="text-xs text-zinc-600">(editable)</span>
+          <h3 className="text-sm font-semibold text-foreground">Professional Summary</h3>
+          <span className="text-xs text-muted-foreground/70">(editable)</span>
         </div>
         <textarea
           value={summary}
           onChange={(e) => setSummary(e.target.value)}
-          className="w-full resize-none bg-zinc-900/50 border border-surface-border rounded-lg p-3
-                     text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none
+          className="w-full resize-none bg-secondary/50 border border-surface-border rounded-lg p-3
+                     text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none
                      focus:border-primary-500/50 transition-colors min-h-[100px]"
           placeholder="Optimized summary will appear here…"
           rows={4}
@@ -174,20 +174,20 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
       <div className="rf-card p-5 space-y-3">
         <div className="flex items-center gap-2">
           <Edit3 className="h-4 w-4 text-primary-400" />
-          <h3 className="text-sm font-semibold text-zinc-200">Skills</h3>
-          <span className="text-xs text-zinc-600">(editable)</span>
+          <h3 className="text-sm font-semibold text-foreground">Skills</h3>
+          <span className="text-xs text-muted-foreground/70">(editable)</span>
         </div>
         <div className="flex flex-wrap gap-2">
           {skills.map((skill) => (
             <span
               key={skill}
               className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs
-                         bg-zinc-800 border border-zinc-700 text-zinc-300"
+                         bg-secondary border border-border text-foreground/80"
             >
               {skill}
               <button
                 onClick={() => removeSkill(skill)}
-                className="text-zinc-600 hover:text-danger transition-colors"
+                className="text-muted-foreground/70 hover:text-danger transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -201,13 +201,13 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
             onChange={(e) => setNewSkill(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && addSkill()}
             placeholder="Add a skill…"
-            className="flex-1 bg-zinc-900/50 border border-surface-border rounded-lg px-3 py-1.5
-                       text-sm text-zinc-200 placeholder:text-zinc-600 focus:outline-none
+            className="flex-1 bg-secondary/50 border border-surface-border rounded-lg px-3 py-1.5
+                       text-sm text-foreground placeholder:text-muted-foreground/70 focus:outline-none
                        focus:border-primary-500/50 transition-colors"
           />
           <button
             onClick={addSkill}
-            className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-zinc-300
+            className="px-3 py-1.5 rounded-lg bg-secondary border border-border text-foreground/80
                        hover:border-primary-500/40 hover:text-primary-400 transition-all"
           >
             <Plus className="h-4 w-4" />
@@ -218,7 +218,7 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
       {/* Bullet changes */}
       {bullets.length > 0 && (
         <div className="space-y-3">
-          <h3 className="text-sm font-semibold text-zinc-300">Experience Bullets</h3>
+          <h3 className="text-sm font-semibold text-foreground/80">Experience Bullets</h3>
           {bullets.map((b, i) => (
             <motion.div
               key={i}
@@ -228,31 +228,31 @@ function EditableContent({ result, onOverridesChange, onDownloadClick }: Editabl
               className="rf-card overflow-hidden"
             >
               {b.section && (
-                <div className="px-4 py-2 border-b border-surface-border bg-zinc-800/50">
-                  <span className="text-xs text-zinc-500 uppercase tracking-wider font-medium">
+                <div className="px-4 py-2 border-b border-surface-border bg-secondary/60">
+                  <span className="text-xs text-muted-foreground uppercase tracking-wider font-medium">
                     {b.section}
                   </span>
                 </div>
               )}
               <div className="divide-y divide-surface-border">
                 <div className="p-3">
-                  <div className="text-xs text-zinc-600 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
+                  <div className="text-xs text-muted-foreground/70 uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-zinc-600" />
                     Original
                   </div>
-                  <p className="text-xs text-zinc-500 leading-relaxed">{b.original}</p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">{b.original}</p>
                 </div>
                 <div className="p-3">
                   <div className="text-xs text-success uppercase tracking-wider mb-1.5 flex items-center gap-1.5">
                     <span className="h-1.5 w-1.5 rounded-full bg-success" />
                     Optimized
-                    <span className="text-zinc-600 normal-case">(editable)</span>
+                    <span className="text-muted-foreground/70 normal-case">(editable)</span>
                   </div>
                   <textarea
                     value={b.optimized}
                     onChange={(e) => updateBullet(i, e.target.value)}
-                    className="w-full resize-none bg-transparent text-xs text-zinc-200 leading-relaxed
-                               focus:outline-none placeholder:text-zinc-600"
+                    className="w-full resize-none bg-transparent text-xs text-foreground leading-relaxed
+                               focus:outline-none placeholder:text-muted-foreground/70"
                     rows={2}
                   />
                 </div>
@@ -328,11 +328,11 @@ export default function OptimizePage() {
           >
             <div className="flex items-center gap-2 mb-2">
               <Sparkles className="w-5 h-5 text-primary-400" />
-              <h3 className="text-lg font-medium text-zinc-100">Job Description</h3>
+              <h3 className="text-lg font-medium text-foreground">Job Description</h3>
             </div>
             <Textarea
               placeholder="Paste the job description here…"
-              className="h-[500px] font-sans text-sm resize-none bg-zinc-900/50 border-surface-border focus:border-primary-500/50 transition-colors"
+              className="h-[500px] font-sans text-sm resize-none bg-secondary/50 border-surface-border focus:border-primary-500/50 transition-colors"
               showCount
               value={jdValue}
               error={errors.jobDescription?.message}
@@ -347,7 +347,7 @@ export default function OptimizePage() {
           <div className="rf-card p-6 border-surface-border">
             <div className="flex items-center gap-2 mb-5">
               <Sparkles className="w-5 h-5 text-zinc-400" />
-              <h3 className="text-md font-medium text-zinc-100">AI Optimization</h3>
+              <h3 className="text-md font-medium text-foreground">AI Optimization</h3>
             </div>
             <Button
               type="submit"
@@ -361,7 +361,7 @@ export default function OptimizePage() {
               {isProcessing ? "Generating…" : "Generate Tailored Resume"}
             </Button>
             {result && !isProcessing && (
-              <p className="text-xs text-zinc-500 text-center mt-3">
+              <p className="text-xs text-muted-foreground text-center mt-3">
                 Optimization complete — edit below then download
               </p>
             )}
@@ -377,7 +377,7 @@ export default function OptimizePage() {
                 className="rf-card p-6 border-primary-500/30 bg-primary-500/5 relative overflow-hidden"
               >
                 {/* Indeterminate progress bar */}
-                <div className="absolute top-0 left-0 w-full h-1 bg-zinc-800 overflow-hidden">
+                <div className="absolute top-0 left-0 w-full h-1 bg-secondary overflow-hidden">
                   <motion.div
                     className="h-full w-1/3 bg-primary-gradient rounded-full"
                     animate={{ x: ["0%", "300%"] }}
@@ -387,10 +387,10 @@ export default function OptimizePage() {
                 <div className="flex flex-col gap-4 pt-1">
                   <div className="flex items-center gap-3">
                     <Loader2 className="h-5 w-5 text-primary-400 animate-spin" />
-                    <span className="text-sm font-medium text-zinc-200">AI is tailoring your profile…</span>
+                    <span className="text-sm font-medium text-foreground">AI is tailoring your profile…</span>
                   </div>
                   <StepList isPending={isProcessing} />
-                  <p className="text-xs text-zinc-600">This usually takes 10–20 seconds.</p>
+                  <p className="text-xs text-muted-foreground/70">This usually takes 10–20 seconds.</p>
                 </div>
               </motion.div>
             )}
@@ -401,13 +401,7 @@ export default function OptimizePage() {
                 result={result}
                 onOverridesChange={setOverrides}
                 onDownloadClick={() => {
-                  // If we have a jobId, use direct download. Otherwise open picker.
-                  const jobId = result.jobId ?? (result as any).job_id;
-                  if (jobId) {
-                    handleDownload();
-                  } else {
-                    setPickerOpen(true);
-                  }
+                  setPickerOpen(true);
                 }}
               />
             )}
@@ -419,8 +413,8 @@ export default function OptimizePage() {
                 animate={{ opacity: 1 }}
                 className="rf-card p-8 flex flex-col items-center justify-center text-center min-h-[200px] border-dashed border-2 border-surface-border bg-transparent"
               >
-                <Sparkles className="h-8 w-8 text-zinc-600 mb-3 opacity-50" />
-                <p className="text-sm text-zinc-500">
+                <Sparkles className="h-8 w-8 text-muted-foreground/70 mb-3 opacity-50" />
+                <p className="text-sm text-muted-foreground">
                   Your tailored content will appear here — review, edit, then download.
                 </p>
               </motion.div>

@@ -44,7 +44,7 @@ export default function RegisterPage() {
   const onSubmit = async (data: FormData) => {
     try {
       const { user } = await registerApi(data);
-      const normUser = { ...user, fullName: user.fullName ?? user.full_name ?? user.email };
+      const normUser = { ...user, fullName: data.fullName };
       loginStore(normUser as typeof user);
       toast.success("Account created! Welcome to ResumeForge.");
       router.push("/dashboard");

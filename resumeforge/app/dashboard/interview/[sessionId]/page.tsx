@@ -28,7 +28,7 @@ function normSession(s: InterviewSession): InterviewSession {
     type: s.type ?? (s.role as InterviewSession["type"]),
     currentQuestionIndex: s.currentQuestionIndex ?? s.current_question_index ?? 0,
     feedback: s.feedback ?? s.responses ?? [],
-    overallScore: s.overallScore ?? s.overall_score ?? s.finalScore ?? s.final_score,
+    overallScore: (s.overallScore ?? s.overall_score ?? s.finalScore ?? s.final_score ?? 0) / 10,
     startedAt: s.startedAt ?? s.started_at,
     completedAt: s.completedAt ?? s.completed_at,
   };
@@ -58,20 +58,20 @@ function FeedbackCard({ feedback }: { feedback: QuestionFeedback }) {
     <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
       <div className="rf-card p-5">
         <div className="flex items-center justify-between mb-3">
-          <h4 className="text-sm font-semibold text-zinc-200">Answer Feedback</h4>
+          <h4 className="text-sm font-semibold text-foreground">Answer Feedback</h4>
           <div className="flex items-center gap-1.5">
             <Star className="h-4 w-4" style={{ color }} />
             <span className="text-xl font-bold font-mono" style={{ color }}>{score.toFixed(1)}</span>
-            <span className="text-sm text-zinc-600">/10</span>
+            <span className="text-sm text-muted-foreground/70">/10</span>
           </div>
         </div>
 
         {/* Sub-scores if backend returns them */}
         {(fb.clarity_score !== undefined || fb.technical_score !== undefined) && (
           <div className="flex gap-4 mb-3 text-xs">
-            {fb.clarity_score   !== undefined && <span className="text-zinc-500">Clarity: <span className="text-zinc-300 font-mono">{fb.clarity_score}</span></span>}
-            {fb.technical_score !== undefined && <span className="text-zinc-500">Technical: <span className="text-zinc-300 font-mono">{fb.technical_score}</span></span>}
-            {fb.tone_score      !== undefined && <span className="text-zinc-500">Tone: <span className="text-zinc-300 font-mono">{fb.tone_score}</span></span>}
+            {fb.clarity_score   !== undefined && <span className="text-muted-foreground">Clarity: <span className="text-foreground/80 font-mono">{fb.clarity_score}</span></span>}
+            {fb.technical_score !== undefined && <span className="text-muted-foreground">Technical: <span className="text-foreground/80 font-mono">{fb.technical_score}</span></span>}
+            {fb.tone_score      !== undefined && <span className="text-muted-foreground">Tone: <span className="text-foreground/80 font-mono">{fb.tone_score}</span></span>}
           </div>
         )}
 
@@ -113,7 +113,7 @@ function FeedbackCard({ feedback }: { feedback: QuestionFeedback }) {
               <Lightbulb className="h-3.5 w-3.5 text-primary-400" />
               <span className="text-xs font-medium text-primary-400 uppercase tracking-wider">Ideal Answer Preview</span>
             </div>
-            <p className="text-xs text-zinc-500 leading-relaxed bg-zinc-800/50 rounded-lg p-3">{fb.idealAnswer}</p>
+            <p className="text-xs text-muted-foreground leading-relaxed bg-secondary/60 rounded-lg p-3">{fb.idealAnswer}</p>
           </div>
         )}
       </div>
@@ -122,8 +122,7 @@ function FeedbackCard({ feedback }: { feedback: QuestionFeedback }) {
 }
 
 // ── Session summary ──────────────────────────────────────────────────────
-function SessionSummary({ session }: { session: InterviewSession }) {
-  const s = normSession(session);
+function SessionSummary({ session: s }: { session: InterviewSession }) {
   const radar = s.radarScores ? [
     { axis: "Relevance",  value: s.radarScores.relevance },
     { axis: "Depth",      value: s.radarScores.depth },
@@ -277,7 +276,7 @@ export default function InterviewSessionPage() {
   if (!session) {
     return (
       <div className="text-center py-20">
-        <p className="text-zinc-500">Session not found.</p>
+        <p className="text-muted-foreground">Session not found.</p>
         <Button variant="outline" className="mt-4" onClick={() => window.location.href = "/dashboard/interview"}>
           Back to Interviews
         </Button>
@@ -297,7 +296,7 @@ export default function InterviewSessionPage() {
     <div className="max-w-2xl mx-auto space-y-6">
       {/* Progress */}
       <div>
-        <div className="flex items-center justify-between mb-2 text-xs text-zinc-500">
+        <div className="flex items-center justify-between mb-2 text-xs text-muted-foreground">
           <span>Question {currentIdx + 1} of {session.questions.length}</span>
           <span className="font-medium text-zinc-400">{typeLabel} · {session.difficulty}</span>
         </div>
@@ -311,7 +310,7 @@ export default function InterviewSessionPage() {
           <div className="text-xs text-primary-400 uppercase tracking-widest font-medium mb-3">
             {currentQ?.category ?? "Question"}
           </div>
-          <p className="text-lg font-medium text-zinc-100 leading-relaxed">{currentQ ? questionText(currentQ) : "Loading…"}</p>
+          <p className="text-lg font-medium text-foreground leading-relaxed">{currentQ ? questionText(currentQ) : "Loading…"}</p>
         </motion.div>
       </AnimatePresence>
 

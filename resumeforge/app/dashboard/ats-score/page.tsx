@@ -59,7 +59,7 @@ function CircularProgress({ score }: { score: number }) {
           initial={{ opacity: 0, scale: 0.5 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.5, duration: 0.4 }}>
           {score}
         </motion.div>
-        <div className="text-xs text-zinc-500 mt-0.5">/ 100</div>
+        <div className="text-xs text-muted-foreground mt-0.5">/ 100</div>
       </div>
     </div>
   );
@@ -73,9 +73,9 @@ function ResultPanel({ result, jd }: { result: ATSScoreResult; jd: string }) {
       {/* Score ring */}
       <div className="rf-card p-6 text-center">
         {(result as ATSScoreResult & { cached?: boolean }).cached && (
-          <div className="text-xs text-zinc-600 mb-2">⚡ Cached result (Redis · 24h)</div>
+          <div className="text-xs text-muted-foreground/70 mb-2">⚡ Cached result (Redis · 24h)</div>
         )}
-        <div className="text-xs uppercase tracking-widest text-zinc-500 mb-4 font-medium">ATS Compatibility Score</div>
+        <div className="text-xs uppercase tracking-widest text-muted-foreground mb-4 font-medium">ATS Compatibility Score</div>
         <CircularProgress score={score} />
         <div className="mt-3">
           <span className="text-sm font-semibold px-3 py-1 rounded-full"
@@ -87,13 +87,13 @@ function ResultPanel({ result, jd }: { result: ATSScoreResult; jd: string }) {
 
       {/* Pillars */}
       <div className="rf-card p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-zinc-300">Score Breakdown</h3>
+        <h3 className="text-sm font-semibold text-foreground/80">Score Breakdown</h3>
         {norm.pillars!.map((p: ScorePillar, i: number) => (
           <motion.div key={p.name} initial={{ opacity: 0, x: 8 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 + i * 0.07 }}>
             <div className="flex items-center justify-between mb-1.5">
               <div className="flex items-center gap-2">
-                <span className="text-xs font-medium text-zinc-300">{p.name}</span>
-                <span className="text-xs text-zinc-600">({p.weight}%)</span>
+                <span className="text-xs font-medium text-foreground/80">{p.name}</span>
+                <span className="text-xs text-muted-foreground/70">({p.weight}%)</span>
               </div>
               <span className="text-xs font-mono font-semibold" style={{ color: getScoreColor(p.score) }}>{p.score}</span>
             </div>
@@ -104,7 +104,7 @@ function ResultPanel({ result, jd }: { result: ATSScoreResult; jd: string }) {
 
       {/* Keywords */}
       <div className="rf-card p-5 space-y-4">
-        <h3 className="text-sm font-semibold text-zinc-300">Keyword Analysis</h3>
+        <h3 className="text-sm font-semibold text-foreground/80">Keyword Analysis</h3>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <div className="flex items-center gap-1.5 mb-2">
@@ -113,7 +113,7 @@ function ResultPanel({ result, jd }: { result: ATSScoreResult; jd: string }) {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {norm.matchedKeywords!.map((k: string) => <span key={k} className="keyword-badge keyword-matched">{k}</span>)}
-              {norm.matchedKeywords!.length === 0 && <span className="text-xs text-zinc-600">None detected</span>}
+              {norm.matchedKeywords!.length === 0 && <span className="text-xs text-muted-foreground/70">None detected</span>}
             </div>
           </div>
           <div>
@@ -123,7 +123,7 @@ function ResultPanel({ result, jd }: { result: ATSScoreResult; jd: string }) {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {norm.missingKeywords!.map((k: string) => <span key={k} className="keyword-badge keyword-missing">{k}</span>)}
-              {norm.missingKeywords!.length === 0 && <span className="text-xs text-zinc-600">All covered!</span>}
+              {norm.missingKeywords!.length === 0 && <span className="text-xs text-muted-foreground/70">All covered!</span>}
             </div>
           </div>
         </div>
@@ -134,7 +134,7 @@ function ResultPanel({ result, jd }: { result: ATSScoreResult; jd: string }) {
         <div className="rf-card p-5 space-y-3">
           <div className="flex items-center gap-2">
             <Info className="h-4 w-4 text-warning" />
-            <h3 className="text-sm font-semibold text-zinc-300">Suggestions</h3>
+            <h3 className="text-sm font-semibold text-foreground/80">Suggestions</h3>
           </div>
           <ul className="space-y-2">
             {norm.suggestions.map((s: string, i: number) => (
@@ -189,7 +189,7 @@ export default function ATSScorePage() {
               <div className="flex items-start gap-3">
                 <div className="mt-1"><Target className="h-5 w-5 text-primary-400" /></div>
                 <div>
-                  <h4 className="text-sm font-semibold text-zinc-100">Scoring Master Profile</h4>
+                  <h4 className="text-sm font-semibold text-foreground">Scoring Master Profile</h4>
                   <p className="text-xs text-zinc-400 mt-1">We will automatically extract experience, skills, and projects from your Master Profile to analyze your fit for this role.</p>
                 </div>
               </div>
@@ -209,8 +209,8 @@ export default function ATSScorePage() {
 
           {!result && !scoreMutation.isPending && (
             <div className="mt-6 rf-card p-5 border-primary-500/20 bg-primary-500/5">
-              <h4 className="text-sm font-semibold text-zinc-200 mb-3">How it works</h4>
-              <ol className="space-y-2 text-xs text-zinc-500">
+              <h4 className="text-sm font-semibold text-foreground mb-3">How it works</h4>
+              <ol className="space-y-2 text-xs text-muted-foreground">
                 {[
                   "Your resume is compared against the JD using semantic NLP analysis",
                   "Keywords are matched with contextual relevance (not just exact strings)",

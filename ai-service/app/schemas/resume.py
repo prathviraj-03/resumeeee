@@ -35,8 +35,7 @@ class OptimizationRequest(BaseModel):
 
 
 class ATSScoreRequest(BaseModel):
-    jobDescription: Optional[str] = Field(default=None, min_length=50, description="The job description to score against")
-    resumeId: Optional[str] = Field(default=None, description="ID of a specific resume to score, otherwise master profile is used")
+    jobDescription: str = Field(..., min_length=50, description="The job description to score against")
 
 
 class SkillGapRequest(BaseModel):

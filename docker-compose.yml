@@ -9,9 +9,10 @@ services:
       POSTGRES_PASSWORD: postgrespassword
       POSTGRES_DB: resumeforge
     ports:
-      - "5432:5432"
+      - "5433:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
+      - ./postgres-init:/docker-entrypoint-initdb.d
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 5s
@@ -32,7 +33,7 @@ services:
   # ── Backend Microservices ──────────────────────────────────────────────────
   api-gateway:
     build:
-      context: "./API GATEWAY"
+      context: "./api-gateway"
     container_name: rf_api_gateway
     ports:
       - "8000:8000"
@@ -56,7 +57,7 @@ services:
       - "8002:8002"
     environment:
       - PORT=8002
-      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/resumeforge?schema=public
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/auth_db_rx?schema=public
       - JWT_SECRET=change-me-in-production
       - SECRET_KEY=change-me-in-production
       - JWT_REFRESH_SECRET=change-me-refresh-in-production
@@ -77,7 +78,7 @@ services:
       - "8003:8003"
     environment:
       - PORT=8003
-      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/resumeforge?schema=public
+      - DATABASE_URL=postgresql://postgres:postgrespassword@postgres:5432/profile_db?schema=public
       - JWT_SECRET=change-me-in-production
       - SECRET_KEY=change-me-in-production
     env_file:
@@ -88,13 +89,13 @@ services:
 
   ai-service:
     build:
-      context: "./AI - service/ai-service"
+      context: "./ai-service"
     container_name: rf_ai_service
     ports:
       - "8001:8001"
     environment:
       - PORT=8001
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/ai_resume
       - REDIS_URL=redis://redis:6379/0
       - PROFILE_SERVICE_URL=http://profile-service:8003
       - JWT_SECRET=change-me-in-production
@@ -102,9 +103,9 @@ services:
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
-      - "./AI - service/ai-service/.env"
+      - "./ai-service/.env"
     volumes:
-      - "./AI - service/ai-service/app:/app/app"
+      - "./ai-service/app:/app/app"
     command: uvicorn app.main:app --host 0.0.0.0 --port 8001
     depends_on:
       postgres:
@@ -114,22 +115,22 @@ services:
 
   interview-service:
     build:
-      context: ./interview/interview-service
+      context: ./interview-service
     container_name: rf_interview_service
     ports:
       - "8004:8004"
     environment:
       - PORT=8004
-      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/resumeforge
+      - DATABASE_URL=postgresql+asyncpg://postgres:postgrespassword@postgres:5432/interview_db
       - REDIS_URL=redis://redis:6379/0
       - JWT_SECRET=change-me-in-production
       - SECRET_KEY=change-me-in-production
     extra_hosts:
       - "host.docker.internal:host-gateway"
     env_file:
-      - ./interview/interview-service/.env
+      - ./interview-service/.env
     volumes:
-      - ./interview/interview-service/app:/app/app
+      - ./interview-service/app:/app/app
     command: uvicorn app.main:app --host 0.0.0.0 --port 8004
     depends_on:
       postgres:

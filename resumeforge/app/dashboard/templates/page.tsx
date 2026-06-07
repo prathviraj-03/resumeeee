@@ -40,7 +40,7 @@ function TokenPalette({ tokens }: { tokens: SupportedTokenResponse | null }) {
   return (
     <div className="space-y-6">
       <div>
-        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Flat Fields</p>
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Flat Fields</p>
         <div className="flex flex-wrap gap-1.5">
           {tokens.flat.map((t) => (
             <div
@@ -49,7 +49,7 @@ function TokenPalette({ tokens }: { tokens: SupportedTokenResponse | null }) {
               className="group relative cursor-help"
             >
               <div className="px-2.5 py-1.5 rounded-lg text-[11px] font-mono
-                         bg-zinc-800 border border-zinc-700 text-zinc-300
+                         bg-secondary border border-border text-foreground/80
                          group-hover:border-primary-500/50 group-hover:bg-primary-500/5 
                          group-hover:text-primary-400 transition-all">
                 {t.token}
@@ -60,19 +60,19 @@ function TokenPalette({ tokens }: { tokens: SupportedTokenResponse | null }) {
       </div>
 
       <div>
-        <p className="text-xs font-bold text-zinc-500 uppercase tracking-widest mb-3">Repeatable Sections (Loops)</p>
+        <p className="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-3">Repeatable Sections (Loops)</p>
         <div className="grid sm:grid-cols-2 gap-3">
           {tokens.loops.map((l) => (
-            <div key={l.section} className="p-3 rounded-xl bg-zinc-900/50 border border-zinc-800 space-y-2">
+            <div key={l.section} className="p-3 rounded-xl bg-secondary/50 border border-border space-y-2">
               <div className="flex items-center justify-between">
                 <code className="text-[11px] text-primary-400 font-bold">{l.syntax}</code>
               </div>
-              <p className="text-[10px] text-zinc-500 leading-relaxed">{l.description}</p>
-              <div className="pt-2 border-t border-zinc-800/50">
-                <p className="text-[9px] font-bold text-zinc-600 uppercase mb-1.5">Inner Fields</p>
+              <p className="text-[10px] text-muted-foreground leading-relaxed">{l.description}</p>
+              <div className="pt-2 border-t border-border/50">
+                <p className="text-[9px] font-bold text-muted-foreground/70 uppercase mb-1.5">Inner Fields</p>
                 <div className="flex flex-wrap gap-1">
                   {l.inner_fields.map((f, idx) => (
-                    <code key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-zinc-800 text-zinc-400">
+                    <code key={idx} className="text-[9px] px-1.5 py-0.5 rounded bg-secondary text-zinc-400">
                       {f.split(' — ')[0]}
                     </code>
                   ))}
@@ -112,7 +112,7 @@ function TemplateCard({
         "group relative p-3.5 rounded-xl border cursor-pointer transition-all",
         isSelected
           ? "border-primary-500/50 bg-primary-500/10"
-          : "border-surface-border bg-zinc-900/50 hover:border-zinc-600"
+          : "border-surface-border bg-secondary/50 hover:border-primary/30"
       )}
     >
       <div className="flex items-start justify-between gap-2">
@@ -120,13 +120,13 @@ function TemplateCard({
           <div
             className={cn(
               "h-8 w-8 rounded-lg flex items-center justify-center shrink-0 mt-0.5",
-              isSelected ? "bg-primary-500/20" : "bg-zinc-800"
+              isSelected ? "bg-primary-500/20" : "bg-secondary"
             )}
           >
             <FileText
               className={cn(
                 "h-4 w-4",
-                isSelected ? "text-primary-400" : "text-zinc-500"
+                isSelected ? "text-primary-400" : "text-muted-foreground"
               )}
             />
           </div>
@@ -134,13 +134,13 @@ function TemplateCard({
             <p
               className={cn(
                 "text-sm font-medium truncate",
-                isSelected ? "text-zinc-100" : "text-zinc-300"
+                isSelected ? "text-foreground" : "text-foreground/80"
               )}
             >
               {template.name}
             </p>
             {template.description && (
-              <p className="text-xs text-zinc-500 truncate mt-0.5">
+              <p className="text-xs text-muted-foreground truncate mt-0.5">
                 {template.description}
               </p>
             )}
@@ -156,7 +156,7 @@ function TemplateCard({
                 e.stopPropagation();
                 onSetDefault();
               }}
-              className="p-1 text-zinc-600 hover:text-yellow-400 transition-colors"
+              className="p-1 text-muted-foreground/70 hover:text-yellow-400 transition-colors"
             >
               <StarOff className="h-3.5 w-3.5" />
             </button>
@@ -166,7 +166,7 @@ function TemplateCard({
               e.stopPropagation();
               onDelete();
             }}
-            className="p-1 text-zinc-600 hover:text-danger transition-colors"
+            className="p-1 text-muted-foreground/70 hover:text-danger transition-colors"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -281,7 +281,7 @@ export default function TemplatesPage() {
           <h2 className="page-title">Custom DOCX Templates</h2>
           <p className="page-subtitle">
             Upload your own .docx file with placeholders like{" "}
-            <code className="px-1.5 py-0.5 rounded bg-zinc-800 text-primary-400 font-mono text-xs">
+            <code className="px-1.5 py-0.5 rounded bg-secondary text-primary-400 font-mono text-xs">
               {"{{full_name}}"}
             </code>{" "}
             to generate personalized resumes.
@@ -312,7 +312,7 @@ export default function TemplatesPage() {
             ) : templates.length === 0 ? (
               <div className="flex flex-col items-center justify-center h-40 text-center rf-card border-dashed">
                 <FileText className="h-8 w-8 text-zinc-700 mb-2" />
-                <p className="text-sm text-zinc-500">No templates yet</p>
+                <p className="text-sm text-muted-foreground">No templates yet</p>
               </div>
             ) : (
               templates.map((t) => (
@@ -344,11 +344,11 @@ export default function TemplatesPage() {
                 className="rf-card p-6 space-y-6"
               >
                 <div className="flex items-center justify-between">
-                  <h3 className="text-lg font-semibold text-zinc-100 flex items-center gap-2">
+                  <h3 className="text-lg font-semibold text-foreground flex items-center gap-2">
                     <FileUp className="h-5 w-5 text-primary-400" />
                     Upload .docx Template
                   </h3>
-                  <button onClick={resetForm} className="text-zinc-500 hover:text-zinc-300">
+                  <button onClick={resetForm} className="text-muted-foreground hover:text-foreground/80">
                     <X className="h-5 w-5" />
                   </button>
                 </div>
@@ -377,7 +377,7 @@ export default function TemplatesPage() {
                     "relative border-2 border-dashed rounded-2xl p-10 flex flex-col items-center justify-center transition-all",
                     selectedFile
                       ? "border-primary-500/50 bg-primary-500/5"
-                      : "border-zinc-800 hover:border-zinc-700 bg-zinc-900/30"
+                      : "border-border hover:border-border bg-secondary/30"
                   )}
                   onDragOver={(e) => e.preventDefault()}
                   onDrop={(e) => {
@@ -397,25 +397,25 @@ export default function TemplatesPage() {
                   {selectedFile ? (
                     <>
                       <FileText className="h-12 w-12 text-primary-400 mb-3" />
-                      <p className="text-sm font-medium text-zinc-200">{selectedFile.name}</p>
-                      <p className="text-xs text-zinc-500 mt-1">
+                      <p className="text-sm font-medium text-foreground">{selectedFile.name}</p>
+                      <p className="text-xs text-muted-foreground mt-1">
                         {(selectedFile.size / 1024).toFixed(1)} KB
                       </p>
                     </>
                   ) : (
                     <>
-                      <div className="h-12 w-12 rounded-xl bg-zinc-800 flex items-center justify-center mb-3">
-                        <FileUp className="h-6 w-6 text-zinc-500" />
+                      <div className="h-12 w-12 rounded-xl bg-secondary flex items-center justify-center mb-3">
+                        <FileUp className="h-6 w-6 text-muted-foreground" />
                       </div>
-                      <p className="text-sm font-medium text-zinc-300">
+                      <p className="text-sm font-medium text-foreground/80">
                         Click or drag your .docx template here
                       </p>
-                      <p className="text-xs text-zinc-600 mt-1">Placeholders use {"{{key}}"} syntax</p>
+                      <p className="text-xs text-muted-foreground/70 mt-1">Placeholders use {"{{key}}"} syntax</p>
                     </>
                   )}
                 </div>
 
-                <div className="bg-zinc-800/50 rounded-xl p-4 flex gap-3">
+                <div className="bg-secondary/60 rounded-xl p-4 flex gap-3">
                   <Info className="h-5 w-5 text-primary-400 shrink-0" />
                   <p className="text-xs text-zinc-400 leading-relaxed">
                     Make sure your .docx contains placeholders like <code className="text-primary-400">{"{{full_name}}"}</code>, 
@@ -457,8 +457,8 @@ export default function TemplatesPage() {
                             <FileText className="h-6 w-6 text-primary-400" />
                           </div>
                           <div>
-                            <h3 className="text-xl font-bold text-zinc-100">{t.name}</h3>
-                            <p className="text-sm text-zinc-500 mt-0.5">{t.description || "No description"}</p>
+                            <h3 className="text-xl font-bold text-foreground">{t.name}</h3>
+                            <p className="text-sm text-muted-foreground mt-0.5">{t.description || "No description"}</p>
                           </div>
                         </div>
                         <Button
@@ -472,12 +472,12 @@ export default function TemplatesPage() {
                       </div>
 
                       <div className="space-y-4">
-                        <h4 className="text-sm font-semibold text-zinc-300 flex items-center gap-2">
+                        <h4 className="text-sm font-semibold text-foreground/80 flex items-center gap-2">
                           <Sparkles className="h-4 w-4 text-primary-400" />
                           Supported Placeholders
                         </h4>
                         <TokenPalette tokens={tokens} />
-                        <p className="text-xs text-zinc-600 italic">
+                        <p className="text-xs text-muted-foreground/70 italic">
                           Use these keys inside double curly braces in your Word document.
                         </p>
                       </div>
@@ -488,8 +488,8 @@ export default function TemplatesPage() {
             ) : (
               <div className="rf-card p-12 flex flex-col items-center justify-center text-center border-dashed bg-transparent h-full min-h-[400px]">
                 <FileText className="h-12 w-12 text-zinc-800 mb-4" />
-                <h3 className="text-lg font-medium text-zinc-500">Select a template</h3>
-                <p className="text-sm text-zinc-600 mt-1 max-w-xs">
+                <h3 className="text-lg font-medium text-muted-foreground">Select a template</h3>
+                <p className="text-sm text-muted-foreground/70 mt-1 max-w-xs">
                   Choose a template from the list to see details or upload a new one to get started.
                 </p>
               </div>
